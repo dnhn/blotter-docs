@@ -16,13 +16,23 @@
     "verify": "pnpm check && pnpm lint && pnpm build"
   },
   "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.5",
+    "@codemirror/language": "^6.12.4",
+    "@codemirror/view": "^6.43.10",
+    "@lezer/highlight": "^1.2.3",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.2.10",
-    "tailwindcss": "^4.3.3"
+    "blotter.ts": "^1.0.1",
+    "codemirror": "^6.0.2",
+    "tailwindcss": "^4.3.3",
+    "three": "^0.185.1",
+    "tweakpane": "^4.0.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "@biomejs/biome": "^2.5.11"
+    "@biomejs/biome": "^2.5.11",
+    "@tweakpane/core": "^2.0.5",
+    "@types/three": "^0.185.4"
   },
   "allowScripts": {
     "esbuild": true

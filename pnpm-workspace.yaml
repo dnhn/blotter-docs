@@ -4,3 +4,4 @@ minimumReleaseAgeExclude:
   - '@astrojs/internal-helpers@0.11.0'
   - '@astrojs/markdown-satteri@0.4.0'
   - astro@7.2.10
+  - blotter.ts@1.0.1
