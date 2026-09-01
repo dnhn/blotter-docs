@@ -1,0 +1,111 @@
+---
+import CodeBlock from "../components/CodeBlock.astro";
+import Base from "../layouts/Base.astro";
+
+const before = `<script src="./path/to/blotter.js"></script>
+<script src="./path/to/materials/liquidDistortMaterial.js"></script>
+<script>
+  var text = new Blotter.Text("observation", {
+    family : "'EB Garamond', serif",
+    size : 27,
+    fill : "#202020"
+  });
+
+  var material = new Blotter.LiquidDistortMaterial();
+
+  var blotter = new Blotter(material, {
+    texts : text
+  });
+
+  blotter.on("ready", function () {
+    var elem = document.getElementById("plain-text");
+    var scope = blotter.forText(text);
+
+    scope.appendTo(elem);
+  });
+</script>`;
+
+const after = `import { Blotter, Text } from "blotter.ts";
+import { LiquidDistortMaterial } from "blotter.ts/materials";
+
+const text = new Text("observation", {
+  family: "'EB Garamond', serif",
+  size: 27,
+  fill: "#202020",
+});
+
+const material = new LiquidDistortMaterial();
+const blotter = new Blotter(material, { texts: text });
+
+const elem = document.getElementById("plain-text");
+if (elem) blotter.forText(text)?.appendTo(elem);
+await blotter.ready;`;
+
+const rows: [string, string][] = [
+  ["<code>&lt;script&gt;</code> + <code>window.Blotter.*</code> globals", "Named ESM imports from <code>blotter.ts</code>"],
+  ["Separate material <code>&lt;script&gt;</code> downloads", "<code>import { ChannelSplitMaterial } from \"blotter.ts/materials\"</code>"],
+  ["<code>new Blotter.Text(...)</code>, <code>new Blotter.Material()</code>", "<code>new Text(...)</code>, <code>new Material()</code>"],
+  ["<code>thing.needsUpdate = true</code>", "<code>blotter.update()</code> / <code>material.update()</code> / automatic on <code>text.value =</code>"],
+  ["<code>blotter.on(\"ready\", ...)</code>", "<code>await blotter.ready</code> (the event still fires)"],
+  ["<code>Blotter.Assets.Shaders.PI</code>", "<code>import { shaders } from \"blotter.ts\"</code> → <code>shaders.pi</code>"],
+  ["<code>Blotter._extendWithGettersSetters</code> subclass protocol", "<code>class MyMaterial extends Material</code>"],
+  ["Bundled underscore/EventEmitter/Three custom build", "Gone; <code>three</code> is a peer dependency"],
+];
+---
+
+<Base title="Migrating · blotter.ts" description="Moving from Blotter.js to blotter.ts.">
+  <div class="pt-content-top pb-masthead">
+    <div class="ml-auto w-full max-w-content max-md:max-w-full">
+      <div class="mb-gutter">
+        <h2 id="migrating">Migrating from Blotter.js</h2>
+        <p>
+          <code>blotter.ts</code> keeps the rendering architecture of the original Blotter and
+          replaces its API. The atlas, the single draw call, the per-text canvases and the five
+          bundled materials all behave as before; what changes is how you get at them.
+        </p>
+      </div>
+      <div class="table-wrap overflow-x-auto">
+        <table
+          class="w-full border-collapse text-[15px] leading-normal [&_td]:border-b [&_td]:border-mist [&_td]:py-2 [&_td]:pr-half-lh [&_td]:text-left [&_td]:align-top [&_th]:border-b [&_th]:border-mist [&_th]:py-2 [&_th]:pr-half-lh [&_th]:text-left [&_th]:align-top [&_th]:font-grotesk [&_th]:text-small [&_th]:font-extrabold [&_th]:tracking-ui [&_th]:uppercase"
+        >
+          <thead>
+            <tr>
+              <th scope="col">Legacy</th>
+              <th scope="col">Now</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              rows.map(([legacy, now]) => (
+                <tr>
+                  <td set:html={legacy} />
+                  <td set:html={now} />
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <h3>Before</h3>
+      <p>The first example from the original documentation, as it was written for Blotter.js:</p>
+      <CodeBlock code={before} lang="html" />
+      <h3>After</h3>
+      <p>The same example against <code>blotter.ts</code>:</p>
+      <CodeBlock code={after} lang="ts" />
+      <p>
+        Note that <code>forText</code> can return <code>undefined</code> for an unknown text, so
+        TypeScript users will want the optional chain, and that the material no longer needs a
+        separate download: it is a named import.
+      </p>
+      <h3>Credits</h3>
+      <p>
+        Blotter was created by <a href="http://bradley.computer">Bradley Griffith</a>. Shader
+        helpers are adapted from <a href="http://www.syedrezaali.com/">Reza Ali's Fragment</a>,
+        and atlas packing from
+        <a href="https://github.com/jakesgordon/bin-packing">Jake Gordon's bin-packing</a>. See
+        the <a href="https://github.com/bradley/Blotter">upstream project</a> for the full original
+        credits.
+      </p>
+    </div>
+  </div>
+</Base>
