@@ -6,7 +6,7 @@ import {
   type TextProperties,
 } from "blotter.ts";
 import { ChannelSplitMaterial } from "blotter.ts/materials";
-import { heroLayouts } from "../data/hero-layouts";
+import { heroLayouts } from "@/data/hero-layouts";
 import {
   cssFamily,
   debounce,

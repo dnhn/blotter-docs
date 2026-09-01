@@ -1,6 +1,6 @@
 import type { Material, Vec2 } from "blotter.ts";
 import { Pane } from "tweakpane";
-import type { Control } from "../data/materials";
+import type { Control } from "@/data/materials";
 
 /** Apply legacy `setImmediate` values so the first frame already uses them. */
 export function applyInitialValues(

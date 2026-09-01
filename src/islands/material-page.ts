@@ -1,4 +1,4 @@
-import { DEMO_TEXT, materialBySlug } from "../data/materials";
+import { DEMO_TEXT, materialBySlug } from "@/data/materials";
 import { applyInitialValues, bindControls } from "./controls";
 import { createDemo } from "./demo";
 import { cssFamily } from "./fonts";

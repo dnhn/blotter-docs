@@ -1,7 +1,7 @@
 ---
-import MaterialPage from "../../components/MaterialPage.astro";
-import UniformDoc from "../../components/UniformDoc.astro";
-import { materialBySlug } from "../../data/materials";
+import MaterialPage from "@/components/MaterialPage.astro";
+import UniformDoc from "@/components/UniformDoc.astro";
+import { materialBySlug } from "@/data/materials";
 
 const entry = materialBySlug("flies");
 if (!entry) throw new Error("Unknown material: flies");

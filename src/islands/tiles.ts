@@ -1,4 +1,4 @@
-import { materialBySlug, TILE_TEXT } from "../data/materials";
+import { materialBySlug, TILE_TEXT } from "@/data/materials";
 import { createDemo } from "./demo";
 import { cssFamily } from "./fonts";
 import { MATERIAL_CLASSES } from "./material-registry";
