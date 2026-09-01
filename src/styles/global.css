@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+@theme inline {
+  --font-display: var(--font-fraunces);
+  --font-grotesk: var(--font-figtree);
+  --font-body: var(--font-garamond);
+  --font-mono: var(--font-ubuntu-mono);
+  --default-font-family: var(--font-garamond);
+  --default-mono-font-family: var(--font-ubuntu-mono);
+}
