@@ -1,0 +1,55 @@
+---
+import { NAV, type NavId } from "../data/nav";
+
+interface Props {
+  current?: NavId;
+}
+
+const { current } = Astro.props;
+const mobileClass = (mobile?: "hidden" | "show") =>
+  mobile === "hidden" ? "max-md:hidden" : mobile === "show" ? "md:hidden" : undefined;
+
+// Text padding only while the label is plain text; nav-blotter.ts flips
+// `data-state` to "canvas" once its Blotter canvas (own padding) is in.
+const link =
+  "inline-block border-none font-grotesk text-ui uppercase tracking-ui leading-[52px] " +
+  "data-[state=text]:px-half-lh aria-[current=page]:font-extrabold " +
+  "max-md:data-[state=text]:px-0 max-md:data-[state=text]:pl-pad-sm " +
+  "[&_.b-canvas]:inline-block [&_.b-canvas]:align-middle";
+---
+
+<header
+  class="pointer-events-none fixed inset-x-0 top-0 z-100 mx-auto h-masthead min-w-layout max-w-[calc(100%-104px)] py-lh before:pointer-events-none before:fixed before:top-0 before:left-0 before:block before:h-masthead before:w-screen before:bg-linear-to-b before:from-paper before:to-paper/0 before:content-[''] max-md:min-w-0 max-md:max-w-none max-md:p-pad-sm"
+>
+  <div class="relative flex items-center justify-between [&_a]:pointer-events-auto">
+    <a
+      href="/"
+      class="flex h-13 items-center border-none font-display text-[32px] leading-none [&_.b-canvas]:-ml-[9px] [&_.b-canvas]:inline-block [&_.b-canvas]:h-[39px]! [&_.b-canvas]:w-auto! [&_.b-canvas]:align-top"
+      aria-label="Blotter, home"
+    >
+      <span data-logo-blotter>blotter</span>
+    </a>
+    <nav aria-label="Primary">
+      <ul class="-mr-half-lh flex list-none p-0 max-md:mr-0">
+        {
+          NAV.map((item) => (
+            <li class:list={["ml-lh max-md:ml-0", mobileClass(item.mobile)]}>
+              <a
+                href={item.href}
+                class={link}
+                data-state="text"
+                aria-current={current === item.id ? "page" : undefined}
+              >
+                <span data-nav-blotter={item.label}>{item.label}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  import "../islands/nav-blotter";
+</script>

@@ -1,0 +1,42 @@
+---
+import Head from "../components/Head.astro";
+import Marginalia from "../components/Marginalia.astro";
+import Masthead from "../components/Masthead.astro";
+import type { NavId } from "../data/nav";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  current?: NavId;
+  /** Wrap the page in the 676px layout column. Off for the home hero. */
+  layout?: boolean;
+}
+
+const { title, description, current, layout = true } = Astro.props;
+---
+
+<html lang="en" class="h-full">
+  <head>
+    <Head title={title} description={description} />
+    <slot name="head" />
+  </head>
+  <body
+    class="relative min-h-full bg-paper p-pad font-body text-base text-ink antialiased wrap-break-word selection:bg-highlight max-md:p-pad-sm"
+  >
+    <Marginalia />
+    <Masthead current={current} />
+    {
+      layout ? (
+        <main class="mx-auto w-full max-w-layout">
+          <slot />
+        </main>
+      ) : (
+        <slot />
+      )
+    }
+    <div class="fixed right-gutter bottom-gutter z-50 font-grotesk text-ui capitalize max-md:hidden">
+      <a href="https://github.com/dnhn/blotter">source code</a>
+    </div>
+  </body>
+</html>
