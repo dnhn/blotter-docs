@@ -1,0 +1,41 @@
+---
+const command = "npm install blotter.ts three";
+---
+
+<div class="mt-lh">
+  <div
+    class="flex items-center justify-between gap-half-lh rounded-sm bg-ink px-lh py-half-lh font-mono text-editor text-paper"
+  >
+    <code
+      class="bg-transparent p-0 text-inherit text-[length:inherit] leading-[inherit] before:opacity-50 before:content-['$_']"
+      >{command}</code
+    >
+    <button
+      type="button"
+      class="shrink-0 cursor-pointer rounded-sm border border-paper/40 bg-transparent px-2.5 py-1.5 font-grotesk text-[12px] leading-none tracking-[0.06em] text-paper uppercase hover:bg-paper/12"
+      data-copy
+      aria-label="Copy install command">Copy</button
+    >
+  </div>
+  <p class="mt-half-lh flex gap-lh font-grotesk text-ui uppercase">
+    <a href="https://www.npmjs.com/package/blotter.ts">npm</a>
+    <a href="https://github.com/dnhn/blotter">GitHub</a>
+  </p>
+</div>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy]")) {
+    button.addEventListener("click", async () => {
+      const code = button.parentElement?.querySelector("code")?.textContent ?? "";
+      try {
+        await navigator.clipboard.writeText(code);
+        button.textContent = "Copied";
+      } catch {
+        button.textContent = "Failed";
+      }
+      setTimeout(() => {
+        button.textContent = "Copy";
+      }, 1500);
+    });
+  }
+</script>

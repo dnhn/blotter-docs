@@ -1,16 +1,53 @@
 ---
-import '@/styles/global.css'
+import Hero from "../components/Hero.astro";
+import InstallCommand from "../components/InstallCommand.astro";
+import Base from "../layouts/Base.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<title>blotter</title>
-	</head>
-	<body>
-		<h1>blotter</h1>
-	</body>
-</html>
+<Base title="blotter.ts" layout={false}>
+  <Fragment slot="head">
+    <script is:inline>
+      // Redirect the legacy hash routes (#/overview, #/materials/FliesMaterial …).
+      (function () {
+        var hash = window.location.hash;
+        if (!hash || hash.indexOf("#/") !== 0) return;
+        var path = hash.slice(1).replace(/\/+$/, "");
+        var known = {
+          "/overview": "/overview",
+          "/basics": "/basics",
+          "/materials": "/materials",
+          "/documentation": "/documentation",
+        };
+        var material = path.match(
+          /^\/materials\/(ChannelSplit|Flies|LiquidDistort|RollingDistort|SlidingDoor)Material$/
+        );
+        var target = known[path];
+        if (!target && material) {
+          target =
+            "/materials/" + material[1].replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+        }
+        if (target) window.location.replace(target);
+      })();
+    </script>
+  </Fragment>
+
+  <main
+    class="-mx-pad -mt-pad grid min-h-screen grid-cols-[minmax(0,1fr)_650px] items-center py-content-top max-xl:min-h-0 max-xl:grid-cols-1 max-md:-mx-pad-sm max-md:-mt-pad-sm"
+  >
+    <div class="w-full px-gutter max-xl:mx-auto max-xl:max-w-[780px] max-md:px-pad-sm">
+      <div class="ml-auto w-full max-w-content max-md:max-w-full">
+        <p class="text-[20px] leading-lh">
+          A JavaScript API for drawing unconventional text effects on the web.
+        </p>
+        <p class="mt-lh text-small">
+          <code>blotter.ts</code> is an ESM, TypeScript rewrite of Blotter. It is published on npm
+          and depends on <code>three</code> as a peer dependency, so install both.
+        </p>
+        <InstallCommand />
+      </div>
+    </div>
+    <div class="order-first min-w-0 overflow-clip px-gutter max-xl:order-1 max-xl:pt-masthead max-md:px-pad-sm">
+      <Hero />
+    </div>
+  </main>
+</Base>
