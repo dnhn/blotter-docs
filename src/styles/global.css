@@ -1,5 +1,63 @@
 @import "tailwindcss";
 
+/*  Theme: the legacy 26px grid, palette and type scale as Tailwind tokens.
+    `static` keeps every variable in the output so islands can read them. */
+@theme static {
+  --breakpoint-*: initial;
+  --breakpoint-md: 728px;
+  --breakpoint-xl: 1196px;
+
+  --color-ink: #202020;
+  --color-paper: #ffffff;
+  --color-mist: #f3f3f3;
+  --color-highlight: #fff700;
+  --color-mint: #34e85f;
+  --color-violet: #8a2be2;
+  --color-editor-fg: #dcdcdc;
+  --color-editor-muted: #8e8e8e;
+  --color-editor-line: #373737;
+  --color-editor-rule: #b5b5b5;
+  --color-editor-glow: #979797;
+
+  --spacing-lh: 26px;
+  --spacing-half-lh: 13px;
+  --spacing-gutter: 52px;
+  --spacing-col: 130px;
+  --spacing-masthead: 104px;
+  --spacing-content-top: 182px;
+  --spacing-pad: 26px;
+  --spacing-pad-sm: 17px;
+  --spacing-hero: 624px;
+  --spacing-tile: 208px;
+  /* Cropped material demo: tuned by eye for Fraunces "B" at 187px. */
+  --spacing-demo-crop: 145px;
+  --spacing-demo-ml: 148px;
+  --spacing-demo-mt: 116px;
+
+  --container-layout: 676px;
+  --container-content: 546px;
+  --container-aside: 312px;
+  --container-hero: 728px;
+
+  --text-base: 17px;
+  --text-base--line-height: 26px;
+  --text-small: 13px;
+  --text-small--line-height: 1.5;
+  --text-code: 14px;
+  --text-code--line-height: 18px;
+  --text-ui: 14px;
+  --text-ui--line-height: 26px;
+  --text-editor: 16px;
+  --text-editor--line-height: 20px;
+  --text-h2: 32px;
+  --text-h2--line-height: 26px;
+  --text-h3: 20px;
+  --text-h3--line-height: 26px;
+
+  --leading-lh: 26px;
+  --tracking-ui: 0.04em;
+}
+
 @theme inline {
   --font-display: var(--font-fraunces);
   --font-grotesk: var(--font-figtree);
@@ -7,4 +65,143 @@
   --font-mono: var(--font-ubuntu-mono);
   --default-font-family: var(--font-garamond);
   --default-mono-font-family: var(--font-ubuntu-mono);
+}
+
+/*  Element defaults for the prose pages. */
+@layer base {
+  :root {
+    /* Shiki `css-variables` theme: the legacy editor palette. */
+    --astro-code-foreground: var(--color-editor-fg);
+    --astro-code-background: var(--color-ink);
+    --astro-code-token-comment: var(--color-editor-muted);
+    --astro-code-token-constant: var(--color-editor-fg);
+    --astro-code-token-string: var(--color-editor-fg);
+    --astro-code-token-keyword: var(--color-editor-fg);
+    --astro-code-token-parameter: var(--color-editor-fg);
+    --astro-code-token-function: var(--color-editor-fg);
+    --astro-code-token-string-expression: var(--color-editor-fg);
+    --astro-code-token-punctuation: var(--color-editor-fg);
+    --astro-code-token-link: var(--color-editor-fg);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply mb-lh font-display font-normal leading-normal tracking-[0.015em] text-ink [word-spacing:0.15em];
+  }
+
+  h2 {
+    @apply text-h2;
+  }
+
+  h3 {
+    @apply mt-lh mb-0 text-h3 font-bold italic;
+  }
+
+  h3 + p {
+    @apply mt-0;
+  }
+
+  p {
+    font-feature-settings: "onum", "pnum", "kern", "ss01";
+    font-kerning: normal;
+    letter-spacing: 0.015em;
+  }
+
+  p + p,
+  p + aside,
+  aside + p,
+  aside + aside,
+  p + .code-block,
+  .code-block + p,
+  .code-block + .code-block,
+  p + ul,
+  p + ol,
+  p + .table-wrap,
+  .table-wrap + p {
+    @apply mt-lh;
+  }
+
+  a {
+    @apply relative border-b border-ink text-ink no-underline;
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    @apply outline-2 outline-offset-2 outline-violet;
+  }
+
+  strong {
+    @apply font-medium;
+  }
+
+  sup {
+    @apply ml-px text-[85%] leading-none;
+  }
+
+  sup a {
+    @apply border-none;
+  }
+
+  code {
+    @apply rounded-sm bg-mist px-1 pt-[3px] pb-1 font-mono text-code text-ink;
+  }
+
+  /* Canvases created by Blotter; contexts override with [&_.b-canvas]:… */
+  .b-canvas {
+    @apply block;
+  }
+}
+
+/*  Composite utilities. */
+
+/* Paragraphs under an API member: tight to the signature, spaced from each other. */
+@utility description {
+  margin-top: 6px;
+
+  & + & {
+    margin-top: 13px;
+  }
+}
+
+/* Tweakpane 4 pane restyled to the site palette (variables are Tweakpane's). */
+@utility tp-legacy-theme {
+  --tp-base-background-color: var(--color-paper);
+  --tp-base-shadow-color: rgb(32 32 32 / 0.15);
+  --tp-button-background-color: var(--color-ink);
+  --tp-button-background-color-active: var(--color-editor-line);
+  --tp-button-background-color-focus: var(--color-editor-line);
+  --tp-button-background-color-hover: var(--color-editor-line);
+  --tp-button-foreground-color: var(--color-paper);
+  --tp-container-background-color: var(--color-mist);
+  --tp-container-background-color-active: #e6e6e6;
+  --tp-container-background-color-focus: #e6e6e6;
+  --tp-container-background-color-hover: #e6e6e6;
+  --tp-container-foreground-color: var(--color-ink);
+  --tp-groove-foreground-color: #e6e6e6;
+  --tp-input-background-color: var(--color-mist);
+  --tp-input-background-color-active: #e6e6e6;
+  --tp-input-background-color-focus: #e6e6e6;
+  --tp-input-background-color-hover: #e6e6e6;
+  --tp-input-foreground-color: var(--color-ink);
+  --tp-label-foreground-color: var(--color-ink);
+  --tp-monitor-background-color: var(--color-mist);
+  --tp-monitor-foreground-color: var(--color-ink);
+
+  & .tp-rotv {
+    border: 2px solid var(--color-ink);
+    border-radius: 0;
+    box-shadow: none;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  & .tp-rotv_t {
+    font-family: var(--font-grotesk);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: var(--tracking-ui);
+    text-transform: uppercase;
+  }
 }
