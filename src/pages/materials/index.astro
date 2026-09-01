@@ -1,0 +1,29 @@
+---
+import MaterialTile from "../../components/MaterialTile.astro";
+import { materials } from "../../data/materials";
+import Base from "../../layouts/Base.astro";
+---
+
+<Base title="Materials · blotter.ts" current="materials">
+  <div class="pt-content-top pb-masthead">
+    <div class="ml-auto w-full max-w-content max-md:max-w-full">
+      <div class="mb-gutter">
+        <h2 id="materials">Materials</h2>
+        <p>
+          Blotter Materials describe how your texts will be rendered and provide the interface
+          through which you can introduce variety in the characteristics of any effect.
+        </p>
+        <p>
+          Listed below are Blotter's current set of ready-to-use materials, all exported from
+          <code>blotter.ts/materials</code>. For information on creating custom materials for
+          private use, or for contributing new materials to
+          <a href="https://github.com/dnhn/blotter">Blotter</a> to be listed here, see the
+          <a href="/documentation#custom-materials">documentation</a>.
+        </p>
+      </div>
+    </div>
+    <ul class="grid list-none grid-cols-[repeat(auto-fill,208px)] gap-lh p-0">
+      {materials.map((entry) => <MaterialTile entry={entry} />)}
+    </ul>
+  </div>
+</Base>

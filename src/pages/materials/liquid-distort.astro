@@ -1,0 +1,60 @@
+---
+import MaterialPage from "../../components/MaterialPage.astro";
+import UniformDoc from "../../components/UniformDoc.astro";
+import { materialBySlug } from "../../data/materials";
+
+const entry = materialBySlug("liquid-distort");
+if (!entry) throw new Error("Unknown material: liquid-distort");
+---
+
+<MaterialPage entry={entry}>
+  <p slot="intro">
+    Like watching the tiles on the bottom of a swimming pool, the
+    <code>LiquidDistortMaterial</code> washes over your text to apply a liquid-like distortion.
+  </p>
+
+  <UniformDoc name="uSpeed" type="1f" default="1">
+    <p class="description">
+      The <code>uSpeed</code> uniform describes the speed of the animation applied to the
+      distortion on your text.
+    </p>
+    <p class="description">
+      Note that when the distortion is animating, i.e., when the value of the
+      <code>uSpeed</code> uniform is more than <code>0.0</code>, the value of the
+      <code>uSeed</code> uniform will have no effect.
+    </p>
+    <p class="description" slot="value">
+      Any floating point value is acceptable, however you will likely want to keep this value
+      below <code>1.0</code>. This value acts as a multiplier against the default uniform passed to
+      all effects, <code>uGlobalTime</code>, which represents the time in seconds since the effect
+      started. Therefore, smaller values slow animation while higher values speed up animation.
+      Play around, you'll get the idea.
+    </p>
+  </UniformDoc>
+
+  <UniformDoc name="uVolatility" type="1f" default="0.15">
+    <p class="description">
+      When liquid distortion is applied to your text, the amount of distortion – the difference
+      between normal looking text and highly abstracted text – is determined by the
+      <code>uVolatility</code> uniform.
+    </p>
+    <p class="description" slot="value">
+      Any floating point value is acceptable, however you will likely want to keep this value
+      below <code>1.0</code>. <code>LiquidDistortMaterial</code> assumes a maximum amount of
+      distortion you would typically want through this material, which is reached at
+      <code>1.0</code> (100%). Exceeding this is, however, entirely acceptable.
+    </p>
+  </UniformDoc>
+
+  <UniformDoc name="uSeed" type="1f" default="0.1">
+    <p class="description">
+      When animating, i.e., when the value of the <code>uSpeed</code> uniform is more than
+      <code>0.0</code>, variations in how the distortion determined by the
+      <code>uVolatility</code> uniform are applied to your text are handled automatically.
+      However, when the value of the <code>uSpeed</code> uniform is at <code>0.0</code>,
+      determining the application of the <code>uVolatility</code> uniform is left to you. To
+      adjust distortion variation in this case, use the <code>uSeed</code> uniform.
+    </p>
+    <p class="description" slot="value">Any floating point value is acceptable.</p>
+  </UniformDoc>
+</MaterialPage>

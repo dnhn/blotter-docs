@@ -1,0 +1,43 @@
+---
+import Member from "./Member.astro";
+import NotatedList from "./NotatedList.astro";
+
+interface Props {
+  name: string;
+  type: "1f" | "2f";
+  default: string;
+}
+
+const { name, type, default: defaultValue } = Astro.props;
+---
+
+<li id={name}>
+  <Member name={name} code={`material.uniforms.${name}`} />
+  <slot />
+  <NotatedList>
+    <li>
+      <Member name="value" code={`material.uniforms.${name}.value`} />
+      <slot name="value" />
+      <p class="description">The default value is <code>{defaultValue}</code>.</p>
+    </li>
+    <li>
+      <Member name="type" code={`material.uniforms.${name}.type`} />
+      <p class="description">
+        The uniform type of the value being passed to the shader.{" "}
+        {
+          type === "1f" ? (
+            <Fragment>
+              <code>"1f"</code> means the value is a single float (e.g. <code>0.5</code>).
+            </Fragment>
+          ) : (
+            <Fragment>
+              <code>"2f"</code> means the value is a pair of floating point values, passed in the
+              form of an array (e.g. <code>[0.5, 0.5]</code>).
+            </Fragment>
+          )
+        }{" "}
+        You should not change this property.
+      </p>
+    </li>
+  </NotatedList>
+</li>

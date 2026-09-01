@@ -1,0 +1,85 @@
+---
+import MaterialPage from "../../components/MaterialPage.astro";
+import UniformDoc from "../../components/UniformDoc.astro";
+import { materialBySlug } from "../../data/materials";
+
+const entry = materialBySlug("sliding-door");
+if (!entry) throw new Error("Unknown material: sliding-door");
+---
+
+<MaterialPage entry={entry}>
+  <p slot="intro">
+    The <code>SlidingDoorMaterial</code> multiplies your text into a series of segmented panes. As
+    the effect animates, copies of your text slide in stunted progression within and outside their
+    individual frames, appearing to drag each other along as they move. The resulting effect is
+    that your text splits and reorganizes itself, again and again in an endless loop.
+  </p>
+
+  <UniformDoc name="uDivisions" type="1f" default="5">
+    <p class="description">
+      The <code>uDivisions</code> uniform describes the number of panes to separate your text
+      into, along the animation axis. By default, your text animates vertically and therefore the
+      value of the <code>uDivisions</code> uniform describes a number of divisions along the Y
+      axis. However, when the value of the <code>uAnimateHorizontal</code> uniform is more than
+      <code>0.0</code> the value of the <code>uDivisions</code> uniform describes a number of
+      divisions along the X axis.
+    </p>
+    <p class="description" slot="value">Any floating point value is acceptable.</p>
+  </UniformDoc>
+
+  <UniformDoc name="uDivisionWidth" type="1f" default="0.25">
+    <p class="description">
+      Consider the panes of your text, each separately sliding, one after the other, out of and
+      back into their original positions. As each pane follows its predecessor, it does so on a
+      delay, waiting for the previous pane to animate some number of pixels before its own
+      animation begins. The distance each pane covers before its descendant begins animating is
+      described by the <code>uDivisionWidth</code> uniform.
+    </p>
+    <p class="description" slot="value">
+      A floating point value between <code>0.0</code> (0%) and <code>1.0</code> (100%), relative
+      to the height of your text (including any padding and line height).
+    </p>
+  </UniformDoc>
+
+  <UniformDoc name="uAnimateHorizontal" type="1f" default="0">
+    <p class="description">
+      By default, <code>SlidingDoorMaterial</code> assumes that animation within its effect takes
+      place along the vertical (Y) axis. The <code>uAnimateHorizontal</code> uniform serves as a
+      boolean (true/false) value, meant to tell the effect whether or not to animate along the
+      horizontal (X) axis.
+    </p>
+    <p class="description" slot="value">
+      A floating point value. Either <code>0.0</code> (false) or <code>1.0</code> (true).
+    </p>
+  </UniformDoc>
+
+  <UniformDoc name="uFlipAnimationDirection" type="1f" default="0">
+    <p class="description">
+      By default, <code>SlidingDoorMaterial</code> animates your text in a predetermined
+      direction, depending on the value of the <code>uAnimateHorizontal</code> uniform. When the
+      value of the <code>uAnimateHorizontal</code> uniform is equal to <code>0.0</code> and your
+      text is animating vertically, your text will animate from bottom to top by default. When the
+      value of the <code>uAnimateHorizontal</code> uniform is more than <code>0.0</code> and your
+      text is animating horizontally, your text will animate from right to left by default. The
+      <code>uFlipAnimationDirection</code> uniform serves as a boolean (true/false) value, meant to
+      tell the effect whether or not to invert animation along the axis determined by the
+      <code>uAnimateHorizontal</code> uniform.
+    </p>
+    <p class="description" slot="value">
+      A floating point value. Either <code>0.0</code> (false) or <code>1.0</code> (true).
+    </p>
+  </UniformDoc>
+
+  <UniformDoc name="uSpeed" type="1f" default="0.2">
+    <p class="description">
+      The <code>uSpeed</code> uniform describes the speed of the animation of the panes of the
+      <code>SlidingDoorMaterial</code>.
+    </p>
+    <p class="description" slot="value">
+      Any floating point value is acceptable. This value acts as a multiplier against the default
+      uniform passed to all effects, <code>uGlobalTime</code>, which represents the time in
+      seconds since the effect started. Therefore, smaller values slow animation while higher
+      values speed up animation. Play around, you'll get the idea.
+    </p>
+  </UniformDoc>
+</MaterialPage>

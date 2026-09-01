@@ -1,0 +1,30 @@
+---
+import type { MaterialEntry } from "../data/materials";
+
+interface Props {
+  entry: MaterialEntry;
+}
+
+const { entry } = Astro.props;
+---
+
+<li class="relative h-masthead w-tile overflow-hidden border-2 border-ink bg-paper text-center">
+  <a href={`/materials/${entry.slug}`} class="group block h-full border-none" aria-label={entry.name}>
+    <div
+      class="flex h-full justify-center font-display data-fallback:items-center data-fallback:text-[68px] data-fallback:leading-none [&_.b-canvas]:mx-auto"
+      data-tile={entry.slug}
+      aria-hidden="true"
+    >
+    </div>
+    <div
+      class="absolute inset-0 bg-paper/90 p-half-lh text-left font-grotesk text-base leading-normal opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
+      aria-hidden="true"
+    >
+      <span>{entry.name}</span>
+    </div>
+  </a>
+</li>
+
+<script>
+  import "../islands/tiles";
+</script>
