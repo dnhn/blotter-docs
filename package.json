@@ -10,14 +10,16 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "check": "astro check",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "verify": "pnpm lint && pnpm build"
+    "verify": "pnpm check && pnpm lint && pnpm build"
   },
   "dependencies": {
     "astro": "^7.2.10"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.10",
     "@biomejs/biome": "^2.5.11"
   },
   "allowScripts": {
