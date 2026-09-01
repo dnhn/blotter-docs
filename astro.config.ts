@@ -1,7 +1,18 @@
 import { defineConfig, fontProviders } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
+import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
+  site: "https://blotter.nhan.dev",
+  compressHTML: true,
+  integrations: [
+    sitemap({
+      changefreq: "monthly",
+      priority: 0.7,
+      lastmod: new Date(),
+      filter: (page) => !page.endsWith("/404"),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },
