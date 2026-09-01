@@ -1,0 +1,14 @@
+---
+/** Signature line of an API member: bold grotesk name plus optional code. */
+interface Props {
+  name: string;
+  code?: string;
+}
+
+const { name, code } = Astro.props;
+---
+
+<p>
+  <strong class="mr-half-lh font-grotesk text-[15px] font-extrabold">{name}</strong>
+  {code && <code>{code}</code>}
+</p>

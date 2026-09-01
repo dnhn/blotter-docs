@@ -1,0 +1,17 @@
+---
+interface Props {
+  n: number;
+}
+
+const { n } = Astro.props;
+---
+
+<aside
+  class="relative left-gutter w-[calc(100%-52px)] max-w-aside text-small md:-left-col [&_code]:text-[12px]"
+  id={`fn-${n}`}
+>
+  <span class="absolute top-0 -left-gutter w-gutter text-center text-[14px]" aria-hidden="true"
+    ><b class="text-[200%] leading-none font-normal text-violet">[</b>{n}]</span
+  >
+  <slot />
+</aside>

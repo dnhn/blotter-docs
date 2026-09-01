@@ -1,0 +1,16 @@
+---
+import Member from "./Member.astro";
+
+interface Props {
+  name: string;
+  code?: string;
+  id?: string;
+}
+
+const { name, code, id } = Astro.props;
+---
+
+<li id={id} class="[&_.code-block]:my-half-lh">
+  <Member name={name} code={code} />
+  <slot />
+</li>
