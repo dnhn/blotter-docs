@@ -4,8 +4,8 @@ import {
   type RenderScope,
   ShaderMaterial,
   Text,
-} from "blotter.ts";
-import { cssFamily, prefersReducedMotion, waitForFonts } from "./fonts";
+} from 'blotter.ts';
+import { cssFamily, prefersReducedMotion, waitForFonts } from './fonts';
 
 /**
  * Renders the masthead logo and nav labels through Blotter (legacy
@@ -123,7 +123,7 @@ void mainImage(out vec4 mainImage, in vec2 fragCoord) {
 
 function stopAfterFirstFrame(blotter: Blotter): void {
   if (!prefersReducedMotion()) return;
-  const off = blotter.on("render", () => {
+  const off = blotter.on('render', () => {
     off();
     blotter.stop();
   });
@@ -134,28 +134,28 @@ function showCanvas(
   label: HTMLElement,
   scope: RenderScope,
 ): void {
-  scope.domElement.setAttribute("aria-hidden", "true");
-  label.classList.add("sr-only");
-  anchor.dataset.state = "canvas";
+  scope.domElement.setAttribute('aria-hidden', 'true');
+  label.classList.add('sr-only');
+  anchor.dataset.state = 'canvas';
   scope.appendTo(anchor);
 }
 
 async function mountLogo(label: HTMLElement): Promise<void> {
-  const anchor = label.closest<HTMLElement>("a");
+  const anchor = label.closest<HTMLElement>('a');
   if (!anchor) return;
 
-  const family = cssFamily("--font-fraunces");
-  await waitForFonts([`400 48px ${family}`], "blotter");
+  const family = cssFamily('--font-fraunces');
+  await waitForFonts([`400 48px ${family}`], 'blotter');
 
-  const text = new Text("blotter", {
+  const text = new Text('blotter', {
     family,
     size: 48,
     weight: 400,
-    leading: "52px",
+    leading: '52px',
     paddingTop: 14,
     paddingLeft: 14,
     paddingRight: 14,
-    fill: "#202020",
+    fill: '#202020',
   });
   const blotter = new Blotter(new ShaderMaterial(LOGO_MAIN_IMAGE), {
     texts: text,
@@ -169,62 +169,62 @@ async function mountLogo(label: HTMLElement): Promise<void> {
 }
 
 async function mountNav(labels: HTMLElement[]): Promise<void> {
-  const family = cssFamily("--font-figtree");
-  await waitForFonts([`400 14px ${family}`], "DOCUMENTATION");
+  const family = cssFamily('--font-figtree');
+  await waitForFonts([`400 14px ${family}`], 'DOCUMENTATION');
 
   const texts = labels.map(
     (label) =>
-      new Text(label.dataset.navBlotter ?? label.textContent ?? "", {
+      new Text(label.dataset.navBlotter ?? label.textContent ?? '', {
         family,
         size: 14,
         weight: 400,
-        leading: "50px",
+        leading: '50px',
         paddingLeft: 13,
         paddingRight: 13,
         paddingTop: 2,
-        fill: "#202020",
+        fill: '#202020',
       }),
   );
   const material = new ShaderMaterial(NAV_MAIN_IMAGE, {
-    uniforms: { hovering: { type: "1f", value: 0 } },
+    uniforms: { hovering: { type: '1f', value: 0 } },
   });
   const blotter = new Blotter(material, { texts });
   await blotter.ready;
 
   labels.forEach((label, i) => {
-    const anchor = label.closest<HTMLElement>("a");
+    const anchor = label.closest<HTMLElement>('a');
     const text = texts[i];
     const scope = text ? blotter.forText(text) : undefined;
     if (!anchor || !scope) return;
 
     showCanvas(anchor, label, scope);
 
-    const active = anchor.getAttribute("aria-current") === "page";
+    const active = anchor.getAttribute('aria-current') === 'page';
     const setHover = (on: boolean) => {
       const hovering = scope.material.uniforms.hovering;
       if (hovering) hovering.value = on || active ? 1 : 0;
     };
     setHover(false);
-    anchor.addEventListener("mouseenter", () => setHover(true));
-    anchor.addEventListener("mouseleave", () => setHover(false));
-    anchor.addEventListener("focus", () => setHover(true));
-    anchor.addEventListener("blur", () => setHover(false));
+    anchor.addEventListener('mouseenter', () => setHover(true));
+    anchor.addEventListener('mouseleave', () => setHover(false));
+    anchor.addEventListener('focus', () => setHover(true));
+    anchor.addEventListener('blur', () => setHover(false));
   });
 
   stopAfterFirstFrame(blotter);
 }
 
-const logo = document.querySelector<HTMLElement>("[data-logo-blotter]");
+const logo = document.querySelector<HTMLElement>('[data-logo-blotter]');
 const navLabels = [
-  ...document.querySelectorAll<HTMLElement>("[data-nav-blotter]"),
+  ...document.querySelectorAll<HTMLElement>('[data-nav-blotter]'),
 ];
 
 if (isWebGLSupported()) {
   if (logo && !logo.dataset.mounted) {
-    logo.dataset.mounted = "true";
+    logo.dataset.mounted = 'true';
     mountLogo(logo).catch(console.error);
   }
   const pending = navLabels.filter((label) => !label.dataset.mounted);
-  for (const label of pending) label.dataset.mounted = "true";
+  for (const label of pending) label.dataset.mounted = 'true';
   if (pending.length) mountNav(pending).catch(console.error);
 }

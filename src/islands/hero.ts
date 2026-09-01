@@ -4,18 +4,18 @@ import {
   type RenderScope,
   Text,
   type TextProperties,
-} from "blotter.ts";
-import { ChannelSplitMaterial } from "blotter.ts/materials";
-import { heroLayouts } from "@/data/hero-layouts";
+} from 'blotter.ts';
+import { ChannelSplitMaterial } from 'blotter.ts/materials';
+import { heroLayouts } from '@/data/hero-layouts';
 import {
   cssFamily,
   debounce,
   prefersReducedMotion,
   waitForFonts,
-} from "./fonts";
+} from './fonts';
 
 // No "Q": it does not sit well with this typeface (legacy note kept).
-const LETTERS = "ABCDEFGHIJKLMNOPRSTUVWXYZ".split("");
+const LETTERS = 'ABCDEFGHIJKLMNOPRSTUVWXYZ'.split('');
 const SIZES = [17, 17, 26, 26, 26, 26, 78, 78, 78, 104, 104, 156, 208];
 
 function shuffle<T>(input: readonly T[]): T[] {
@@ -40,20 +40,20 @@ interface Center {
 
 async function mountHero(el: HTMLElement): Promise<void> {
   if (el.dataset.mounted) return;
-  el.dataset.mounted = "true";
+  el.dataset.mounted = 'true';
 
   if (!isWebGLSupported()) {
-    el.dataset.fallback = "true";
-    el.textContent = "B";
+    el.dataset.fallback = 'true';
+    el.textContent = 'B';
     return;
   }
 
-  const family = cssFamily("--font-figtree");
+  const family = cssFamily('--font-figtree');
   const base: Partial<TextProperties> = {
     family,
     weight: 800,
     leading: 1,
-    fill: "#202020",
+    fill: '#202020',
     paddingLeft: 60,
     paddingRight: 60,
     paddingTop: 50,
@@ -62,7 +62,7 @@ async function mountHero(el: HTMLElement): Promise<void> {
 
   await waitForFonts(
     [...new Set(SIZES)].map((size) => `800 ${size}px ${family}`),
-    LETTERS.join(""),
+    LETTERS.join(''),
   );
 
   const texts = shuffle(LETTERS)
@@ -123,20 +123,20 @@ async function mountHero(el: HTMLElement): Promise<void> {
   );
 
   if (prefersReducedMotion()) {
-    const off = blotter.on("render", () => {
+    const off = blotter.on('render', () => {
       off();
       blotter.stop();
     });
     return;
   }
 
-  window.addEventListener("resize", debounce(measure, 250));
-  document.addEventListener("mousemove", (event) => {
+  window.addEventListener('resize', debounce(measure, 250));
+  document.addEventListener('mousemove', (event) => {
     const size = pageSize();
     aim(event.pageX / size.w, event.pageY / size.h);
   });
 }
 
-for (const el of document.querySelectorAll<HTMLElement>("[data-hero]")) {
+for (const el of document.querySelectorAll<HTMLElement>('[data-hero]')) {
   mountHero(el).catch(console.error);
 }

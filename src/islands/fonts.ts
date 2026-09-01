@@ -1,14 +1,14 @@
-import type { TextProperties } from "blotter.ts";
+import type { TextProperties } from 'blotter.ts';
 
 /** Resolve a font-family list from a CSS custom property on `:root`. */
 export const cssFamily = (variable: string): string =>
   getComputedStyle(document.documentElement)
     .getPropertyValue(variable)
-    .trim() || "sans-serif";
+    .trim() || 'sans-serif';
 
 /** CSS `font` shorthand for `document.fonts.load()`. */
 export const fontSpec = (props: Partial<TextProperties>): string =>
-  `${props.style ?? "normal"} ${props.weight ?? 400} ${props.size ?? 12}px ${props.family ?? "sans-serif"}`;
+  `${props.style ?? 'normal'} ${props.weight ?? 400} ${props.size ?? 12}px ${props.family ?? 'sans-serif'}`;
 
 /**
  * Blotter rasterises text at construction, so every face it needs must be
@@ -16,7 +16,7 @@ export const fontSpec = (props: Partial<TextProperties>): string =>
  */
 export async function waitForFonts(
   specs: string[],
-  sample = "blotter",
+  sample = 'blotter',
 ): Promise<void> {
   await Promise.all(
     specs.map((spec) => document.fonts.load(spec, sample).catch(() => [])),
@@ -25,7 +25,7 @@ export async function waitForFonts(
 }
 
 export const prefersReducedMotion = (): boolean =>
-  matchMedia("(prefers-reduced-motion: reduce)").matches;
+  matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export function debounce<A extends unknown[]>(
   fn: (...args: A) => void,
@@ -46,7 +46,7 @@ const HASHED_FAMILY = /^(.+)-[0-9a-f]{16}$/;
  * page code and the playground can say `family: "'EB Garamond', serif"`.
  */
 export function ensureFontAliases(): void {
-  if (document.head.querySelector("style[data-font-aliases]")) return;
+  if (document.head.querySelector('style[data-font-aliases]')) return;
   const rules: string[] = [];
 
   for (const sheet of document.styleSheets) {
@@ -59,9 +59,9 @@ export function ensureFontAliases(): void {
     for (const rule of cssRules) {
       if (!(rule instanceof CSSFontFaceRule)) continue;
       const family = rule.style
-        .getPropertyValue("font-family")
+        .getPropertyValue('font-family')
         .trim()
-        .replace(/^"|"$/g, "");
+        .replace(/^"|"$/g, '');
       const match = HASHED_FAMILY.exec(family);
       if (!match?.[1]) continue;
       rules.push(
@@ -73,9 +73,9 @@ export function ensureFontAliases(): void {
     }
   }
 
-  const style = document.createElement("style");
-  style.dataset.fontAliases = "true";
-  style.textContent = rules.join("\n");
+  const style = document.createElement('style');
+  style.dataset.fontAliases = 'true';
+  style.textContent = rules.join('\n');
   document.head.append(style);
 }
 

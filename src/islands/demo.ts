@@ -5,8 +5,8 @@ import {
   type RenderScope,
   Text,
   type TextProperties,
-} from "blotter.ts";
-import { fontSpec, prefersReducedMotion, waitForFonts } from "./fonts";
+} from 'blotter.ts';
+import { fontSpec, prefersReducedMotion, waitForFonts } from './fonts';
 
 export interface DemoOptions {
   el: HTMLElement;
@@ -26,7 +26,7 @@ export interface Demo {
 function fallback(el: HTMLElement, value: string): null {
   el.replaceChildren();
   el.textContent = value;
-  el.dataset.fallback = "true";
+  el.dataset.fallback = 'true';
   return null;
 }
 
@@ -43,13 +43,13 @@ export async function createDemo(o: DemoOptions): Promise<Demo | null> {
     const text = new Text(o.value, o.props);
     const blotter = new Blotter(o.material, { texts: text });
     const scope = blotter.forText(text);
-    if (!scope) throw new Error("Blotter returned no render scope");
+    if (!scope) throw new Error('Blotter returned no render scope');
 
     scope.appendTo(o.el);
     await blotter.ready;
 
     if (prefersReducedMotion()) {
-      const off = blotter.on("render", () => {
+      const off = blotter.on('render', () => {
         off();
         blotter.stop();
       });

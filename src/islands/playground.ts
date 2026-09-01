@@ -1,6 +1,6 @@
-import * as core from "blotter.ts";
-import * as mats from "blotter.ts/materials";
-import { debounce } from "./fonts";
+import * as core from 'blotter.ts';
+import * as mats from 'blotter.ts/materials';
+import { debounce } from './fonts';
 
 type Modules = Record<string, object>;
 
@@ -16,12 +16,12 @@ function createModules(live: Set<core.Blotter>): Modules {
     }
   }
   return {
-    "blotter.ts": { ...core, Blotter: TrackedBlotter },
-    "blotter.ts/materials": { ...mats },
+    'blotter.ts': { ...core, Blotter: TrackedBlotter },
+    'blotter.ts/materials': { ...mats },
   };
 }
 
-const MODULE_NAMES = ["blotter.ts", "blotter.ts/materials"];
+const MODULE_NAMES = ['blotter.ts', 'blotter.ts/materials'];
 const IMPORT_RE =
   /^\s*import\s+(type\s+)?(\{[^}]*\})\s*from\s*["']([^"']+)["'];?/gm;
 
@@ -30,13 +30,13 @@ export function rewriteImports(src: string): string {
   const out = src.replace(
     IMPORT_RE,
     (_match, isType: string | undefined, names: string, spec: string) => {
-      if (isType) return "";
+      if (isType) return '';
       if (!MODULE_NAMES.includes(spec)) {
         throw new Error(
-          `Unknown module "${spec}". Available: ${MODULE_NAMES.join(", ")}`,
+          `Unknown module "${spec}". Available: ${MODULE_NAMES.join(', ')}`,
         );
       }
-      return `const ${names.replace(/\s+as\s+/g, ": ")} = __modules[${JSON.stringify(spec)}];`;
+      return `const ${names.replace(/\s+as\s+/g, ': ')} = __modules[${JSON.stringify(spec)}];`;
     },
   );
   if (/^\s*import\s/m.test(out)) {
@@ -70,13 +70,13 @@ function createRunner(output: HTMLElement, errorEl: HTMLElement): Runner {
       }
       live.clear();
       output.replaceChildren();
-      errorEl.textContent = "";
+      errorEl.textContent = '';
       errorEl.hidden = true;
 
       try {
         const body = rewriteImports(src);
         await document.fonts.ready;
-        await new AsyncFunction("__modules", "output", body)(modules, output);
+        await new AsyncFunction('__modules', 'output', body)(modules, output);
       } catch (error) {
         errorEl.hidden = false;
         errorEl.textContent =
@@ -91,22 +91,22 @@ function createRunner(output: HTMLElement, errorEl: HTMLElement): Runner {
 
 function mount(root: HTMLElement): void {
   if (root.dataset.mounted) return;
-  root.dataset.mounted = "true";
+  root.dataset.mounted = 'true';
 
-  const pre = root.querySelector("pre");
-  const editorEl = root.querySelector<HTMLElement>("[data-editor]");
-  const output = root.querySelector<HTMLElement>("[data-output]");
-  const errorEl = root.querySelector<HTMLElement>("[data-error]");
+  const pre = root.querySelector('pre');
+  const editorEl = root.querySelector<HTMLElement>('[data-editor]');
+  const output = root.querySelector<HTMLElement>('[data-output]');
+  const errorEl = root.querySelector<HTMLElement>('[data-error]');
   if (!pre || !editorEl || !output || !errorEl) return;
 
-  const code = (pre.textContent ?? "").replace(/\n$/, "");
+  const code = (pre.textContent ?? '').replace(/\n$/, '');
   const runner = createRunner(output, errorEl);
   let current = code;
 
   // Canvas first, editor later: the static <pre> is enough to run.
   void runner.run(code);
 
-  import("./playground-editor")
+  import('./playground-editor')
     .then(({ mountEditor }) => {
       mountEditor(
         editorEl,
@@ -122,7 +122,7 @@ function mount(root: HTMLElement): void {
 }
 
 for (const root of document.querySelectorAll<HTMLElement>(
-  "[data-playground]",
+  '[data-playground]',
 )) {
   mount(root);
 }

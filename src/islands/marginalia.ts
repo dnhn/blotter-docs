@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import { prefersReducedMotion } from "./fonts";
+import * as THREE from 'three';
+import { prefersReducedMotion } from './fonts';
 
 /**
  * Port of the legacy GlitchMarginalia helpers: two small canvases that
@@ -7,7 +7,7 @@ import { prefersReducedMotion } from "./fonts";
  * through a glitch pass, and blink in and out on random lifecycles.
  */
 
-const TEXTURE_URL = "/images/glitch_marginalia_texture.png";
+const TEXTURE_URL = '/images/glitch_marginalia_texture.png';
 const TEXTURE_SIZE = 8;
 const CANVAS_COUNT = 2;
 const PADDING = 52;
@@ -232,7 +232,7 @@ class RectGenerator {
 
 /** Two-pass Three.js shader (dithered fog → glitch) drawn on one canvas. */
 class Glitch {
-  readonly canvas = document.createElement("canvas");
+  readonly canvas = document.createElement('canvas');
 
   private readonly renderer: THREE.WebGLRenderer;
   private readonly camera = new THREE.OrthographicCamera(
@@ -343,7 +343,7 @@ class Glitch {
 
 async function mount(container: HTMLElement): Promise<void> {
   if (container.dataset.mounted) return;
-  container.dataset.mounted = "true";
+  container.dataset.mounted = 'true';
 
   const texture = await new THREE.TextureLoader().loadAsync(TEXTURE_URL);
   texture.wrapS = THREE.RepeatWrapping;
@@ -368,7 +368,7 @@ async function mount(container: HTMLElement): Promise<void> {
 
   for (let i = 0; i < CANVAS_COUNT; i++) {
     const glitch = new Glitch(texture);
-    glitch.canvas.className = "marginalia";
+    glitch.canvas.className = 'marginalia';
     glitch.canvas.hidden = true;
     container.append(glitch.canvas);
     glitches.push(glitch);
@@ -383,11 +383,11 @@ async function mount(container: HTMLElement): Promise<void> {
   requestAnimationFrame(tick);
 }
 
-const container = document.getElementById("marginalia");
+const container = document.getElementById('marginalia');
 const supported = (() => {
   try {
-    const canvas = document.createElement("canvas");
-    return Boolean(canvas.getContext("webgl2") || canvas.getContext("webgl"));
+    const canvas = document.createElement('canvas');
+    return Boolean(canvas.getContext('webgl2') || canvas.getContext('webgl'));
   } catch {
     return false;
   }
