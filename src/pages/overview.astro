@@ -1,0 +1,73 @@
+---
+import Base from "../layouts/Base.astro";
+
+const bullet =
+  "relative before:absolute before:top-lh before:-left-gutter before:w-gutter before:text-center before:font-serif before:font-bold before:content-['⚬'] first:before:top-0 max-md:before:hidden";
+---
+
+<Base title="Overview · blotter.ts" current="overview">
+  <div class="pt-content-top pb-masthead">
+    <div class="ml-auto w-full max-w-content max-md:max-w-full">
+      <div class="mb-gutter">
+        <h2 id="overview">Overview</h2>
+        <p>
+          When applying effects to text on the web, designers have traditionally been constrained
+          to those provided by <code>CSS</code>. In the majority of cases this is entirely suitable
+          – text is text right? Yet still, there exist numerous examples of designers combining
+          <code>CSS</code> properties or gifs and images to create effects that evoke something
+          more playful. Precisely here, Blotter exists to provide an alternative.
+        </p>
+      </div>
+      <ul class="list-none p-0">
+        <li class={bullet}>
+          <h3 class="mt-0">GLSL Backed Text Effects with Ease</h3>
+          <p>
+            Blotter provides a simple interface for building and manipulating text effects that
+            utilize <code>GLSL</code> shaders without requiring that the designer write
+            <code>GLSL</code>. Blotter has a growing library of configurable effects while also
+            providing ways for student or experienced <code>GLSL</code> programmers to quickly
+            bootstrap new ones.
+          </p>
+        </li>
+        <li class={bullet}>
+          <h3>Atlasing Effects in a Single WebGL Back Buffer</h3>
+          <p>
+            Blotter renders all texts in a single WebGL context and limits the number of draw
+            calls it makes by using atlases. When multiple texts share the same effect they are
+            mapped into a single texture and rendered together. The resulting image data is then
+            output to individual <code>2d</code> contexts for each element.
+          </p>
+        </li>
+        <li class={bullet}>
+          <h3>Animation Loop</h3>
+          <p>
+            Rather than executing on a time based interval, Blotter's internal animation loop uses
+            <code>requestAnimationFrame</code> to match the browser's display refresh rate and
+            pause when the user navigates to other browser tabs; improving performance and
+            preserving the battery life on the user's device.
+          </p>
+        </li>
+        <li class={bullet}>
+          <h3>What Blotter Isn't</h3>
+          <p>
+            Any texts you pass to Blotter can be individually configured using familiar style
+            properties. You can use custom font faces through the <code>@font-face</code> spec.
+            However, Blotter ultimately renders the texts passed to it into <code>canvas</code>
+            elements. This means rendered text won't be selectable. Blotter is great for elements
+            like titles, headings, and texts used for graphic purposes. It's not recommended that
+            Blotter be used for lengthy bodies of text.
+          </p>
+        </li>
+        <li class={bullet}>
+          <h3>A Modern Rewrite</h3>
+          <p>
+            <code>blotter.ts</code> is a TypeScript rewrite of Bradley Griffith's original
+            Blotter. The rendering architecture is unchanged; the API is new: named ESM imports,
+            <code>three</code> as a peer dependency, and no global namespace. If you are coming
+            from Blotter.js, see <a href="/migrating">migrating</a>.
+          </p>
+        </li>
+      </ul>
+    </div>
+  </div>
+</Base>
