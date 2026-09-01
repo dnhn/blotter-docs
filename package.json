@@ -16,7 +16,9 @@
     "verify": "pnpm check && pnpm lint && pnpm build"
   },
   "dependencies": {
-    "astro": "^7.2.10"
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.2.10",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
