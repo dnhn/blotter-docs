@@ -1,0 +1,32 @@
+---
+import CodeBlock from "./CodeBlock.astro";
+
+interface Props {
+  id: string;
+  code: string;
+}
+
+const { id, code } = Astro.props;
+---
+
+<div class="my-gutter mr-auto w-full max-w-content max-md:max-w-full" data-playground id={id}>
+  <div class="min-h-[92px] bg-ink" data-editor>
+    <CodeBlock code={code} lang="js" class="my-0" />
+  </div>
+  <p
+    class="border-t border-editor-line bg-ink px-lh py-half-lh font-mono text-code whitespace-pre-wrap text-highlight"
+    data-error
+    role="alert"
+    hidden
+  >
+  </p>
+  <div
+    class="relative mt-[78px] w-full border-2 border-ink bg-paper before:absolute before:-top-gutter before:left-[calc(50%-5px)] before:h-lh before:font-grotesk before:text-[26px] before:leading-lh before:content-['↓']"
+  >
+    <div class="min-h-[92px] w-full text-center [&_.b-canvas]:mx-auto [&_.b-canvas]:my-lh" data-output></div>
+  </div>
+</div>
+
+<script>
+  import "../islands/playground";
+</script>
