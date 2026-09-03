@@ -5,12 +5,20 @@ import {
   ShaderMaterial,
   Text,
 } from 'blotter.ts';
-import { cssFamily, prefersReducedMotion, waitForFonts } from './fonts';
+import { renderOnce } from './demo';
+import {
+  cssFamily,
+  FACE,
+  prefersReducedMotion,
+  WEIGHT,
+  waitForFonts,
+} from './fonts';
+import { onThemeChange, readColor, toVec3 } from './theme';
 
 /**
- * Renders the masthead logo and nav labels through Blotter (legacy
- * `Views.Navigation`). Real text stays in the DOM for assistive tech and
- * is only visually hidden once a canvas is ready.
+ * Renders the masthead wordmark through Blotter (legacy `Views.Navigation`
+ * logo). Real text stays in the DOM for assistive tech and is only visually
+ * hidden once the canvas is ready.
  */
 
 const LOGO_MAIN_IMAGE = /* glsl */ `
@@ -86,40 +94,23 @@ void mainImage( out vec4 mainImage, in vec2 fragCoord )
 
     float a = 1.0 - min(darkestSample.r, min(darkestSample.g, darkestSample.b));
 
-    float r = 1.0 - (1.0 - darkestSample.r) / a;
-    float g = 1.0 - (1.0 - darkestSample.g) / a;
-    float b = 1.0 - (1.0 - darkestSample.b) / a;
-    vec3 outRGB = vec3(r, g, b);
-
-    mainImage = vec4(outRGB, a);
+    // Coverage from the darkest sample; colour from the theme.
+    mainImage = vec4(uInk, a);
 }
 `;
 
-const NAV_MAIN_IMAGE = /* glsl */ `
-float when_gt(float x, float y) {
-  return max(sign(x - y), 0.0);
+const inkUniform = () => ({
+  uInk: { type: '3f' as const, value: toVec3(readColor('--ink')) },
+});
+
+/** Point a nav shader at the current ink; redraw if the loop is stopped. */
+function followTheme(blotter: Blotter): void {
+  onThemeChange(() => {
+    const ink = blotter.material.uniforms.uInk;
+    if (ink) ink.value = toVec3(readColor('--ink'));
+    renderOnce(blotter);
+  });
 }
-
-float when_lt(float x, float y) {
-  return max(sign(y - x), 0.0);
-}
-
-void mainImage(out vec4 mainImage, in vec2 fragCoord) {
-    vec2 uv = fragCoord.xy / uResolution.xy;
-    vec2 p = vec2(1.0) / uResolution.xy;
-
-    float stepDistance = 6.5 * p.y;
-
-    vec2 thresholdCenter = vec2(0.5);
-    float slope = 0.1;
-    float threshold = (slope * (uv.x - thresholdCenter.x)) + (thresholdCenter.y);
-
-    uv.x += (stepDistance * when_gt(uv.y, threshold) * hovering); // Shift right
-    uv.x -= (stepDistance * when_lt(uv.y, threshold) * hovering); // Shift left
-
-    mainImage = textTexture(uv);
-}
-`;
 
 function stopAfterFirstFrame(blotter: Blotter): void {
   if (!prefersReducedMotion()) return;
@@ -136,7 +127,6 @@ function showCanvas(
 ): void {
   scope.domElement.setAttribute('aria-hidden', 'true');
   label.classList.add('sr-only');
-  anchor.dataset.state = 'canvas';
   scope.appendTo(anchor);
 }
 
@@ -144,22 +134,24 @@ async function mountLogo(label: HTMLElement): Promise<void> {
   const anchor = label.closest<HTMLElement>('a');
   if (!anchor) return;
 
-  const family = cssFamily('--font-fraunces');
-  await waitForFonts([`400 48px ${family}`], 'blotter');
+  const family = cssFamily(FACE.display);
+  await waitForFonts([`${WEIGHT.display} 48px ${family}`], 'blotter');
 
   const text = new Text('blotter', {
     family,
     size: 48,
-    weight: 400,
+    weight: WEIGHT.display,
     leading: '52px',
     paddingTop: 14,
     paddingLeft: 14,
     paddingRight: 14,
-    fill: '#202020',
+    fill: '#000',
   });
-  const blotter = new Blotter(new ShaderMaterial(LOGO_MAIN_IMAGE), {
-    texts: text,
-  });
+  const blotter = new Blotter(
+    new ShaderMaterial(LOGO_MAIN_IMAGE, { uniforms: inkUniform() }),
+    { texts: text },
+  );
+  followTheme(blotter);
   const scope = blotter.forText(text);
   if (!scope) return;
 
@@ -168,63 +160,9 @@ async function mountLogo(label: HTMLElement): Promise<void> {
   stopAfterFirstFrame(blotter);
 }
 
-async function mountNav(labels: HTMLElement[]): Promise<void> {
-  const family = cssFamily('--font-figtree');
-  await waitForFonts([`400 14px ${family}`], 'DOCUMENTATION');
-
-  const texts = labels.map(
-    (label) =>
-      new Text(label.dataset.navBlotter ?? label.textContent ?? '', {
-        family,
-        size: 14,
-        weight: 400,
-        leading: '50px',
-        paddingLeft: 13,
-        paddingRight: 13,
-        paddingTop: 2,
-        fill: '#202020',
-      }),
-  );
-  const material = new ShaderMaterial(NAV_MAIN_IMAGE, {
-    uniforms: { hovering: { type: '1f', value: 0 } },
-  });
-  const blotter = new Blotter(material, { texts });
-  await blotter.ready;
-
-  labels.forEach((label, i) => {
-    const anchor = label.closest<HTMLElement>('a');
-    const text = texts[i];
-    const scope = text ? blotter.forText(text) : undefined;
-    if (!anchor || !scope) return;
-
-    showCanvas(anchor, label, scope);
-
-    const active = anchor.getAttribute('aria-current') === 'page';
-    const setHover = (on: boolean) => {
-      const hovering = scope.material.uniforms.hovering;
-      if (hovering) hovering.value = on || active ? 1 : 0;
-    };
-    setHover(false);
-    anchor.addEventListener('mouseenter', () => setHover(true));
-    anchor.addEventListener('mouseleave', () => setHover(false));
-    anchor.addEventListener('focus', () => setHover(true));
-    anchor.addEventListener('blur', () => setHover(false));
-  });
-
-  stopAfterFirstFrame(blotter);
-}
-
 const logo = document.querySelector<HTMLElement>('[data-logo-blotter]');
-const navLabels = [
-  ...document.querySelectorAll<HTMLElement>('[data-nav-blotter]'),
-];
 
-if (isWebGLSupported()) {
-  if (logo && !logo.dataset.mounted) {
-    logo.dataset.mounted = 'true';
-    mountLogo(logo).catch(console.error);
-  }
-  const pending = navLabels.filter((label) => !label.dataset.mounted);
-  for (const label of pending) label.dataset.mounted = 'true';
-  if (pending.length) mountNav(pending).catch(console.error);
+if (isWebGLSupported() && logo && !logo.dataset.mounted) {
+  logo.dataset.mounted = 'true';
+  mountLogo(logo).catch(console.error);
 }

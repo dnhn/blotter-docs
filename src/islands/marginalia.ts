@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { prefersReducedMotion } from './fonts';
+import { onThemeChange, readColor, toVec3 } from './theme';
 
 /**
  * Port of the legacy GlitchMarginalia helpers: two small canvases that
@@ -11,13 +12,14 @@ const TEXTURE_URL = '/images/glitch_marginalia_texture.png';
 const TEXTURE_SIZE = 8;
 const CANVAS_COUNT = 2;
 const PADDING = 52;
-const MIN_VIEWPORT = 728;
+const MIN_VIEWPORT = 768;
 
 const LIFECYCLES = [1000, 1500, 2000, 2500, 3000, 4000];
 const DEATHCYCLES = [
   0, 500, 1000, 1500, 2000, 2500, 3000, 4000, 6000, 6500, 7000, 7500, 8000,
   9000, 9500,
 ];
+// Long thin rectangles in one axis or the other; the fog reads best in a band.
 const SIZES: readonly (readonly [number, number])[] = [
   [26, 26],
   [26, 104],
@@ -100,15 +102,6 @@ float fbm (in vec2 st, in float speed) {
     return value;
 }
 
-void combineColors( out vec4 adjustedColor, in vec4 bg, in vec4 color ) {
-    float a = color.a;
-    float r = (1.0 - a) * bg.r + a * color.r;
-    float g = (1.0 - a) * bg.g + a * color.g;
-    float b = (1.0 - a) * bg.b + a * color.b;
-
-    adjustedColor = vec4(r, g, b, 1.0);
-}
-
 void main () {
     vec2 uv = _vTexCoord;
 
@@ -135,8 +128,10 @@ void main () {
 
     float alphaModifier = smoothstep(0.0, 1.0, (noise.r + noise.g + noise.b) / 3.0) - 0.185;
 
-    vec4 outColor = vec4(vec3(0.0), smoothstep(0.0, 0.65, (1.0 - min(ditherColor.r, min(ditherColor.g, ditherColor.b))) * alphaModifier));
-    combineColors(gl_FragColor, vec4(1.0), outColor);
+    // Coverage only; the glitch pass colours it. Nothing else is painted, so the
+    // page background shows through.
+    float coverage = smoothstep(0.0, 0.65, (1.0 - min(ditherColor.r, min(ditherColor.g, ditherColor.b))) * alphaModifier);
+    gl_FragColor = vec4(0.0, 0.0, 0.0, coverage);
 }
 `;
 
@@ -147,18 +142,10 @@ uniform vec2 uResolution;
 uniform sampler2D uSampler;
 uniform float uTime;
 uniform float uTimeOffset;
+uniform vec3 uPaper;
+uniform vec3 uInk;
 
 varying vec2 _vTexCoord;
-
-void rgbaFromRgb( out vec4 rgba, in vec3 rgb ) {
-  float a = 1.0 - min(rgb.r, min(rgb.g, rgb.b));
-
-  float r = 1.0 - (1.0 - rgb.r) / a;
-  float g = 1.0 - (1.0 - rgb.g) / a;
-  float b = 1.0 - (1.0 - rgb.b) / a;
-
-  rgba = vec4(r, g, b, a);
-}
 
 void main () {
     vec2 uv = _vTexCoord;
@@ -179,13 +166,18 @@ void main () {
       uv_b += dist * 1.795;
     }
 
-    vec4 outColor;
-    outColor.r = texture2D(uSampler, uv_r).r;
-    outColor.g = texture2D(uSampler, uv_g).g;
-    outColor.b = texture2D(uSampler, uv_b).b;
-
-    rgbaFromRgb(outColor, outColor.rgb);
-    gl_FragColor = outColor;
+    // Each channel reads its own displaced coverage, so the split shows as a
+    // paper/ink fringe. Alpha is the strongest channel; the colour is the mix
+    // that would composite to the same result on the page background.
+    vec3 coverage = vec3(
+      texture2D(uSampler, uv_r).a,
+      texture2D(uSampler, uv_g).a,
+      texture2D(uSampler, uv_b).a
+    );
+    float a = max(coverage.r, max(coverage.g, coverage.b));
+    if (a <= 0.0) discard;
+    vec3 rgb = mix(uPaper, uInk, coverage / a);
+    gl_FragColor = vec4(rgb, a);
 }
 `;
 
@@ -202,7 +194,7 @@ const randomInt = (min: number, max: number): number =>
 const sample = <T>(list: readonly T[]): T =>
   list[randomInt(0, list.length - 1)] as T;
 
-/** Random rectangles from the legacy size table, inside the padded container. */
+/** Random rectangles from the size table, inside the padded container. */
 class RectGenerator {
   private width = 0;
   private height = 0;
@@ -288,6 +280,8 @@ class Glitch {
       uTime: { value: 0 },
       uTimeOffset: { value: this.timeOffset },
       uSampler: { value: this.rtTarget.texture },
+      uPaper: { value: new THREE.Vector3(...toVec3(readColor('--paper'))) },
+      uInk: { value: new THREE.Vector3(...toVec3(readColor('--ink'))) },
     };
     this.mesh = new THREE.Mesh(
       new THREE.PlaneGeometry(1, 1),
@@ -327,6 +321,14 @@ class Glitch {
       this.texture.wrapT = wrapT;
       this.texture.needsUpdate = true;
     }
+  }
+
+  /** Repaint the fog in the current theme's colours. */
+  setColors(): void {
+    const paper = this.uniforms.uPaper?.value as THREE.Vector3 | undefined;
+    const ink = this.uniforms.uInk?.value as THREE.Vector3 | undefined;
+    paper?.set(...toVec3(readColor('--paper')));
+    ink?.set(...toVec3(readColor('--ink')));
   }
 
   render(time: number): void {
@@ -374,6 +376,10 @@ async function mount(container: HTMLElement): Promise<void> {
     glitches.push(glitch);
     cycle(glitch);
   }
+
+  onThemeChange(() => {
+    for (const glitch of glitches) glitch.setColors();
+  });
 
   const tick = () => {
     const time = (performance.now() - startTime) / 1000;
