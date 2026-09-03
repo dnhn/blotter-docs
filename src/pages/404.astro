@@ -2,13 +2,19 @@
 import Base from "@/layouts/Base.astro";
 ---
 
-<Base title="Not found · blotter.ts">
-  <div class="pt-content-top pb-masthead">
-    <div class="ml-auto w-full max-w-content max-md:max-w-full">
-      <h2>Not found</h2>
-      <p>There is nothing at this address. Try the <a href="/">home page</a>, the
-        <a href="/basics">basics</a>, the <a href="/materials">materials</a>, or the
-        <a href="/documentation">documentation</a>.</p>
-    </div>
+<Base
+  title="Not found · blotter.ts"
+  description="That address does not exist. Find the guide, the materials and the API reference for blotter.ts here."
+  search={false}
+>
+  <div class="max-w-2xl py-section">
+    <p class="eyebrow mb-4">404</p>
+    <h1 class="font-display text-display text-ink">Nothing here.</h1>
+    <p class="mt-6 text-xl/normal text-ink-2">
+      The address may be old. Try the <a href="/" class="text-accent underline">home page</a>, the
+      <a href="/guide/getting-started" class="text-accent underline">guide</a>, the
+      <a href="/materials" class="text-accent underline">materials</a>, or the
+      <a href="/api" class="text-accent underline">API reference</a>.
+    </p>
   </div>
 </Base>
