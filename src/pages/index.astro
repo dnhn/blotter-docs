@@ -34,7 +34,7 @@ const doors = [
 ];
 
 const link =
-  "inline-flex items-center gap-1.5 text-small font-medium text-accent underline decoration-accent/40 underline-offset-[0.2em] transition-colors hover:decoration-accent";
+  "inline-flex items-center gap-1.5 text-small font-medium text-accent underline decoration-accent/60 underline-offset-[0.2em] transition-colors hover:decoration-accent";
 ---
 
 <Base title="blotter.ts — text effects for the web" layout={false}>
@@ -94,7 +94,7 @@ const link =
             <li>
               <a
                 href={door.href}
-                class="group flex h-full flex-col rounded-lg border border-rule bg-surface p-6 transition-colors hover:border-ink-3"
+                class="group flex h-full flex-col rounded-lg border border-rule-strong bg-surface p-6 transition-colors hover:border-ink-3"
               >
                 <h2 class="font-display text-h3 text-ink">{door.title}</h2>
                 <p class="mt-2 flex-1 text-small text-ink-2">{door.text}</p>

@@ -19,25 +19,29 @@
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-/*  Semantic palette: neutral grays, one restrained slate accent.
-    Raw declarations: these define the tokens the utilities are built from. */
+/*  Semantic palette: neutral grays, one restrained slate accent. Every text
+    colour clears WCAG AAA (7:1) on paper, surface and code-bg in both themes;
+    ink-2 and ink-3 are the two lightest grays that still do, which is why the
+    steps are close. Raw declarations: the tokens the utilities are built from. */
 :root {
   --paper: light-dark(#ffffff, #121212);
   --surface: light-dark(#f4f4f4, #1b1b1b);
   --rule: light-dark(#e5e5e5, #2a2a2a);
+  /* Boundaries of interactive components: 3:1 against both paper and surface. */
+  --rule-strong: light-dark(#8d8d8d, #676767);
   --ink: light-dark(#171717, #e8e8e8);
-  --ink-2: light-dark(#525252, #a6a6a6);
-  --ink-3: light-dark(#858585, #737373);
+  --ink-2: light-dark(#3c3c3c, #c6c6c6);
+  --ink-3: light-dark(#525252, #a6a6a6);
   --accent: light-dark(#3f4c5c, #aab4c2);
   --accent-soft: light-dark(#e2e6ea, #252a30);
   --selection: light-dark(#d9dde2, #333941);
 
   --code-bg: light-dark(#f7f7f7, #1b1b1b);
   --code-fg: light-dark(#171717, #e8e8e8);
-  --code-comment: light-dark(#858585, #737373);
+  --code-comment: light-dark(#525252, #a6a6a6);
   --code-keyword: light-dark(#3f4c5c, #aab4c2);
-  --code-string: light-dark(#4d5e4f, #a8bba9);
-  --code-number: light-dark(#6a5d4b, #c4b39c);
+  --code-string: light-dark(#46574a, #a8bba9);
+  --code-number: light-dark(#57493a, #c4b39c);
   --code-line: light-dark(#ededed, #242424);
 
   /* Shiki's own variable names; not ours to rename. */
@@ -58,6 +62,7 @@
   --color-paper: var(--paper);
   --color-surface: var(--surface);
   --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
@@ -165,7 +170,7 @@
   }
 
   .prose :where(a) {
-    @apply text-accent underline decoration-accent/40 transition-[text-decoration-color] duration-120;
+    @apply text-accent underline decoration-accent/60 transition-[text-decoration-color] duration-120;
   }
 
   .prose :where(a:hover) {
@@ -245,7 +250,7 @@
   --tp-monitor-foreground-color: var(--ink);
 
   & .tp-rotv {
-    @apply rounded-lg border border-rule font-mono text-[11px] shadow-none;
+    @apply rounded-lg border border-rule-strong font-mono text-[11px] shadow-none;
   }
 
   & .tp-rotv_t {

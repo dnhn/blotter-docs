@@ -32,7 +32,7 @@ const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
       <PageHeader eyebrow={eyebrow} title={heading} lead={lead} class="mb-10" />
       {
         sections.length > 0 && (
-          <details class="mb-10 rounded-lg border border-rule bg-surface px-4 py-3 text-small lg:hidden" data-pagefind-ignore>
+          <details class="mb-10 rounded-lg border border-rule-strong bg-surface px-4 py-3 text-small lg:hidden" data-pagefind-ignore>
             <summary class="cursor-pointer font-medium text-ink">On this page</summary>
             <ul class="mt-2 list-none space-y-1 p-0">
               {sections.map((section) => (

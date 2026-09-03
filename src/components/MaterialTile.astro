@@ -11,7 +11,7 @@ const { entry } = Astro.props;
 <!-- The card clips its content, so the focus ring goes on the card rather than
      the link inside it, where `overflow-hidden` would cut it away. -->
 <li
-  class="overflow-hidden rounded-lg border border-rule bg-surface transition-colors hover:border-ink-3 has-[a:focus-visible]:border-ink-3 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-accent"
+  class="overflow-hidden rounded-lg border border-rule-strong bg-surface transition-colors hover:border-ink-3 has-[a:focus-visible]:border-ink-3 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-accent"
 >
   <a href={`/materials/${entry.slug}`} class="block focus-visible:outline-hidden">
     <div
