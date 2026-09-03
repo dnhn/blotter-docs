@@ -1,0 +1,152 @@
+---
+import Callout from "@/components/Callout.astro";
+import CodeBlock from "@/components/CodeBlock.astro";
+import Playground from "@/components/Playground.astro";
+import Sidenote from "@/components/Sidenote.astro";
+import { guideGroups, guidePage } from "@/data/guide";
+import Docs from "@/layouts/Docs.astro";
+
+const page = guidePage("/guide/getting-started");
+
+const install = `npm install blotter.ts three`;
+
+const imports = `import { Blotter, Material, Text } from "blotter.ts";
+import { ChannelSplitMaterial } from "blotter.ts/materials";`;
+
+const firstText = `import { Blotter, Material, Text } from "blotter.ts";
+
+const text = new Text("observation", {
+  family: "'Gloock', serif",
+  size: 64,
+  fill: "#171717",
+  paddingLeft: 20,
+  paddingRight: 20,
+});
+
+// The plain Material draws the text exactly as described.
+const blotter = new Blotter(new Material(), { texts: text });
+
+blotter.forText(text)?.appendTo(output);
+await blotter.ready;`;
+
+const fonts = `const text = new Text("observation", {
+  family: "'Gloock', serif",
+  size: 64,
+});
+
+// Load the exact face, weight and size Blotter is about to draw with.
+await document.fonts.load('400 64px "Gloock"', text.value);
+await document.fonts.ready;
+
+const blotter = new Blotter(material, { texts: text });`;
+---
+
+<Docs
+  title="Getting started · blotter.ts"
+  description={page.description}
+  current="guide"
+  eyebrow="Guide"
+  heading={page.title}
+  lead={page.description}
+  groups={guideGroups()}
+  sections={page.sections}
+>
+  <h2 id="why-blotter">Why Blotter</h2>
+  <p>
+    CSS runs out of tricks for text quite quickly. You get shadows, gradients, a clip-path if
+    you are feeling brave, and then you are exporting PNGs. Blotter takes a different route: it
+    hands each word on your page to a fragment shader and draws it, every frame, on the GPU.
+    The text stays typographic. Your font, your size, your weight. Only the pixels are up for
+    negotiation.
+  </p>
+  <p>
+    The trade is that what comes back is a <code>canvas</code>, not a DOM text node. Nobody
+    can select it and screen readers will not see it, so keep the real text nearby. Blotter is
+    for titles, headings, logotypes and words used as graphics. It is the wrong tool for a
+    paragraph.
+  </p>
+
+  <h2 id="install">Install</h2>
+  <p>
+    Blotter renders through <code>three</code> and leaves it to you to install, so the two go
+    in together.
+  </p>
+  <CodeBlock code={install} lang="sh" />
+  <p>
+    The package is an ES module with types. Everything comes from two entry points: the core
+    classes from <code>blotter.ts</code>, and the ready-made effects from
+    <code>blotter.ts/materials</code>. Import what you use; the rest is shaken out of your
+    bundle.
+  </p>
+  <CodeBlock code={imports} lang="ts" />
+
+  <h2 id="first-text">Your first text</h2>
+  <p>
+    A Blotter needs two things: at least one <code>Text</code>, and a <code>Material</code>
+    that says how to draw it. The plain <code>Material</code> applies no effect at all, which
+    makes it the right place to start: if the word below looks like the word you typed, the
+    pipeline is working.
+  </p>
+  <Sidenote>
+    The examples on this page run as you type. <code>output</code> is the box under each
+    editor.
+  </Sidenote>
+  <Playground id="first-text" code={firstText} />
+
+  <h2 id="what-happened">What just happened</h2>
+  <p>
+    Four objects took part, and you will meet them again on every page of this guide.
+  </p>
+  <ul>
+    <li>
+      A <strong>Text</strong> is a string plus the styles to draw it with. Blotter measures it and
+      rasterises it once, at construction.
+    </li>
+    <li>
+      A <strong>Material</strong> is a fragment shader with named uniforms. Every text that shares
+      a material is drawn by the same program.
+    </li>
+    <li>
+      The <strong>Blotter</strong> packs its texts into one texture atlas, renders the whole atlas
+      through the material in a single WebGL draw call, and keeps doing so on
+      <code>requestAnimationFrame</code>. There is one WebGL context for the entire page, however
+      many Blotters you create.
+    </li>
+    <li>
+      A <strong>RenderScope</strong> is what you get back from <code>blotter.forText(text)</code>: a
+      per-text <code>canvas</code> that copies its own rectangle out of the shared buffer each
+      frame, plus a place to set uniforms for this text alone.
+    </li>
+  </ul>
+  <p>
+    <code>blotter.ready</code> resolves after the first build. Nothing needs it to be awaited
+    before appending a canvas, but anything that reads per-text uniforms or the rendered
+    <code>imageData</code> should wait for it.
+  </p>
+
+  <h2 id="fonts">Fonts come first</h2>
+  <p>
+    Because a text is rasterised the moment it is constructed, the font has to be there
+    already. Build a Blotter while a web font is still downloading and you will get the
+    fallback face baked into the atlas. The fix is one line: ask the font loading API for the
+    exact face, weight and size you are about to use.
+  </p>
+  <CodeBlock code={fonts} lang="ts" />
+  <Callout title="Why the exact size?">
+    <p>
+      <code>document.fonts.load()</code> takes a CSS <code>font</code> shorthand and only
+      guarantees the faces that match it. Variable fonts with optical sizes, and families with
+      separate files per weight, both need the real numbers.
+    </p>
+  </Callout>
+
+  <h2 id="where-next">Where next</h2>
+  <p>
+    <a href="/guide/texts-and-uniforms">Texts and uniforms</a> covers styling, changing a text
+    after the fact, and turning the dials on a running effect. The
+    <a href="/materials">materials</a> pages show the five bundled effects with live controls.
+    When none of them is quite right, <a href="/guide/custom-materials">custom materials</a>
+    walks through writing your own, and the <a href="/api">API reference</a> lists everything
+    the package exports.
+  </p>
+</Docs>

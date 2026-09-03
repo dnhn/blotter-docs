@@ -1,0 +1,54 @@
+---
+import Sidebar from "@/components/docs/Sidebar.astro";
+import PageHeader from "@/components/PageHeader.astro";
+import type { NavId, Section, SidebarGroup } from "@/data/nav";
+import Base from "./Base.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  current: NavId;
+  eyebrow?: string;
+  heading: string;
+  lead?: string;
+  groups: readonly SidebarGroup[];
+  sections?: readonly Section[];
+}
+
+const { title, description, current, eyebrow, heading, lead, groups, sections = [] } = Astro.props;
+const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
+---
+
+<Base title={title} description={description} current={current}>
+  <div class="lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-16">
+    <aside class="max-lg:hidden" data-pagefind-ignore>
+      <div
+        class="sticky top-[calc(4rem+var(--spacing-page-top))] -ml-2 max-h-[calc(100vh-4rem-var(--spacing-page-top)-2rem)] overflow-y-auto pr-4 pl-2"
+      >
+        <Sidebar groups={groups} pathname={pathname} />
+      </div>
+    </aside>
+    <div class="min-w-0">
+      <PageHeader eyebrow={eyebrow} title={heading} lead={lead} class="mb-10" />
+      {
+        sections.length > 0 && (
+          <details class="mb-10 rounded-lg border border-rule bg-surface px-4 py-3 text-small lg:hidden" data-pagefind-ignore>
+            <summary class="cursor-pointer font-medium text-ink">On this page</summary>
+            <ul class="mt-2 list-none space-y-1 p-0">
+              {sections.map((section) => (
+                <li>
+                  <a href={`#${section.id}`} class="text-ink-2 hover:text-ink">
+                    {section.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )
+      }
+      <div class="prose">
+        <slot />
+      </div>
+    </div>
+  </div>
+</Base>

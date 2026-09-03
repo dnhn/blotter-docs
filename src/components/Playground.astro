@@ -9,21 +9,39 @@ interface Props {
 const { id, code } = Astro.props;
 ---
 
-<div class="my-gutter mr-auto w-full max-w-content max-md:max-w-full" data-playground id={id}>
-  <div class="min-h-[92px] bg-ink" data-editor>
-    <CodeBlock code={code} lang="js" class="my-0" />
-  </div>
-  <p
-    class="border-t border-editor-line bg-ink px-lh py-half-lh font-mono text-code whitespace-pre-wrap text-highlight"
-    data-error
-    role="alert"
-    hidden
-  >
-  </p>
-  <div
-    class="relative mt-[78px] w-full border-2 border-ink bg-paper before:absolute before:-top-gutter before:left-[calc(50%-5px)] before:h-lh before:font-grotesk before:text-[26px] before:leading-lh before:content-['↓']"
-  >
-    <div class="min-h-[92px] w-full text-center [&_.b-canvas]:mx-auto [&_.b-canvas]:my-lh" data-output></div>
+<div class="w-full" data-playground id={id} data-pagefind-ignore>
+  <div class="overflow-hidden rounded-lg border border-rule">
+    <div class="flex items-center justify-between gap-4 border-b border-rule bg-surface px-4 py-2">
+      <span class="eyebrow">Live · edits run as you type</span>
+      <button
+        type="button"
+        class="cursor-pointer text-caption font-medium text-ink-2 transition-colors hover:text-ink"
+        data-reset
+      >
+        Reset
+      </button>
+    </div>
+    <div class="min-h-23 bg-code-bg" data-editor>
+      <CodeBlock
+        code={code}
+        lang="js"
+        class="[&_.astro-code]:rounded-none [&_.astro-code]:border-0"
+      />
+    </div>
+    <p
+      class="border-t border-rule bg-accent-soft px-4 py-2 font-mono text-code whitespace-pre-wrap text-ink"
+      data-error
+      role="alert"
+      hidden
+    >
+    </p>
+    <div class="border-t border-rule bg-white text-[#171717]">
+      <div
+        class="min-h-30 w-full text-center [&_.b-canvas]:mx-auto [&_.b-canvas]:my-6 [&_.b-canvas]:max-w-full"
+        data-output
+      >
+      </div>
+    </div>
   </div>
 </div>
 

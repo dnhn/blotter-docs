@@ -1,3 +1,4 @@
+import type { EditorView } from '@codemirror/view';
 import * as core from 'blotter.ts';
 import * as mats from 'blotter.ts/materials';
 import { debounce } from './fonts';
@@ -97,18 +98,20 @@ function mount(root: HTMLElement): void {
   const editorEl = root.querySelector<HTMLElement>('[data-editor]');
   const output = root.querySelector<HTMLElement>('[data-output]');
   const errorEl = root.querySelector<HTMLElement>('[data-error]');
+  const reset = root.querySelector<HTMLButtonElement>('[data-reset]');
   if (!pre || !editorEl || !output || !errorEl) return;
 
   const code = (pre.textContent ?? '').replace(/\n$/, '');
   const runner = createRunner(output, errorEl);
   let current = code;
+  let editor: EditorView | undefined;
 
   // Canvas first, editor later: the static <pre> is enough to run.
   void runner.run(code);
 
   import('./playground-editor')
     .then(({ mountEditor }) => {
-      mountEditor(
+      editor = mountEditor(
         editorEl,
         code,
         debounce((next: string) => {
@@ -119,6 +122,18 @@ function mount(root: HTMLElement): void {
       );
     })
     .catch(console.error);
+
+  reset?.addEventListener('click', () => {
+    if (editor) {
+      editor.dispatch({
+        changes: { from: 0, to: editor.state.doc.length, insert: code },
+      });
+    }
+    if (current !== code) {
+      current = code;
+      void runner.run(code);
+    }
+  });
 }
 
 for (const root of document.querySelectorAll<HTMLElement>(

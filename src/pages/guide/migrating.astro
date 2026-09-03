@@ -1,0 +1,134 @@
+---
+import CodeBlock from "@/components/CodeBlock.astro";
+import { guideGroups, guidePage } from "@/data/guide";
+import Docs from "@/layouts/Docs.astro";
+
+const page = guidePage("/guide/migrating");
+
+const before = `<script src="./path/to/blotter.js"></script>
+<script src="./path/to/materials/liquidDistortMaterial.js"></script>
+<script>
+  var text = new Blotter.Text("observation", {
+    family : "'EB Garamond', serif",
+    size : 27,
+    fill : "#202020"
+  });
+
+  var material = new Blotter.LiquidDistortMaterial();
+
+  var blotter = new Blotter(material, {
+    texts : text
+  });
+
+  blotter.on("ready", function () {
+    var elem = document.getElementById("plain-text");
+    var scope = blotter.forText(text);
+
+    scope.appendTo(elem);
+  });
+</script>`;
+
+const after = `import { Blotter, Text } from "blotter.ts";
+import { LiquidDistortMaterial } from "blotter.ts/materials";
+
+const text = new Text("observation", {
+  family: "'EB Garamond', serif",
+  size: 27,
+  fill: "#202020",
+});
+
+const material = new LiquidDistortMaterial();
+const blotter = new Blotter(material, { texts: text });
+
+const elem = document.getElementById("plain-text");
+if (elem) blotter.forText(text)?.appendTo(elem);
+await blotter.ready;`;
+
+const rows: [string, string][] = [
+  ["<code>&lt;script&gt;</code> tags and <code>window.Blotter.*</code> globals", "Named ESM imports from <code>blotter.ts</code>"],
+  ["A separate <code>&lt;script&gt;</code> per material", "<code>import { ChannelSplitMaterial } from \"blotter.ts/materials\"</code>"],
+  ["<code>new Blotter.Text(…)</code>, <code>new Blotter.Material()</code>", "<code>new Text(…)</code>, <code>new Material()</code>"],
+  ["<code>thing.needsUpdate = true</code>", "<code>blotter.update()</code>, <code>material.update()</code>, or nothing: <code>text.value =</code> rebuilds by itself"],
+  ["<code>blotter.on(\"ready\", …)</code>", "<code>await blotter.ready</code>; the event still fires"],
+  ["<code>Blotter.Assets.Shaders.PI</code>", "<code>import { shaders } from \"blotter.ts\"</code>, then <code>shaders.pi</code>"],
+  ["<code>Blotter._extendWithGettersSetters</code> subclass protocol", "<code>class MyMaterial extends Material</code>"],
+  ["Bundled underscore, EventEmitter and a custom Three build", "Gone. <code>three</code> is a peer dependency"],
+];
+---
+
+<Docs
+  title="Migrating from Blotter.js · blotter.ts"
+  description={page.description}
+  current="guide"
+  eyebrow="Guide"
+  heading={page.title}
+  lead={page.description}
+  groups={guideGroups()}
+  sections={page.sections}
+>
+  <h2 id="what-stayed">What stayed the same</h2>
+  <p>
+    Everything you liked about the rendering. Texts sharing a material are still bin-packed into
+    one atlas and drawn in a single call; each text still gets its own canvas; the loop still
+    runs on <code>requestAnimationFrame</code>; the five materials are the same shaders with the
+    same uniforms. If a Blotter.js effect looked right, it looks the same here.
+  </p>
+
+  <h2 id="what-changed">What changed</h2>
+  <p>
+    The API. Blotter.js was a script tag that put a namespace on <code>window</code>;
+    <code>blotter.ts</code> is a typed ES module with two entry points and no globals.
+  </p>
+  <div class="overflow-x-auto">
+    <table>
+      <thead>
+        <tr><th scope="col">Blotter.js</th><th scope="col">blotter.ts</th></tr>
+      </thead>
+      <tbody>
+        {
+          rows.map(([legacy, now]) => (
+            <tr>
+              <td set:html={legacy} />
+              <td set:html={now} />
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="before-after">Before and after</h2>
+  <p>The first example from the original documentation, as written for Blotter.js:</p>
+  <CodeBlock code={before} lang="html" />
+  <p>The same example against <code>blotter.ts</code>:</p>
+  <CodeBlock code={after} lang="ts" />
+
+  <h2 id="behaviour-notes">Behaviour notes</h2>
+  <ul>
+    <li>
+      <code>forText</code> returns <code>undefined</code> for a text the instance does not know,
+      so TypeScript users want the optional chain.
+    </li>
+    <li>
+      Changing a text’s <code>value</code> or <code>properties</code> rebuilds automatically. The
+      explicit <code>update()</code> is still there for <code>setMaterial</code>,
+      <code>addTexts</code> and <code>removeTexts</code>, and returns a promise.
+    </li>
+    <li>
+      There is no UMD build. Bundle it, or load it from an ESM-aware CDN with an import map.
+    </li>
+    <li>
+      The constructor throws where WebGL is unavailable. Check <code>isWebGLSupported()</code>
+      first and fall back to plain text.
+    </li>
+  </ul>
+
+  <h2 id="credits">Credits</h2>
+  <p>
+    Blotter was created by <a href="http://bradley.computer">Bradley Griffith</a>. Shader helpers
+    are adapted from <a href="http://www.syedrezaali.com/">Reza Ali’s Fragment</a>, and atlas
+    packing from <a href="https://github.com/jakesgordon/bin-packing">Jake Gordon’s bin-packing</a>.
+    See the <a href="https://github.com/bradley/Blotter">upstream project</a> for the full
+    original credits.
+  </p>
+</Docs>

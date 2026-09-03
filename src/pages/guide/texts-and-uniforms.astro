@@ -1,0 +1,205 @@
+---
+import Callout from "@/components/Callout.astro";
+import CodeBlock from "@/components/CodeBlock.astro";
+import Playground from "@/components/Playground.astro";
+import { guideGroups, guidePage } from "@/data/guide";
+import Docs from "@/layouts/Docs.astro";
+
+const page = guidePage("/guide/texts-and-uniforms");
+
+const properties: [string, string, string][] = [
+  ["family", '"sans-serif"', "Any CSS font-family list, including @font-face names."],
+  ["size", "12", "Font size in pixels."],
+  ["leading", "1.5", "Line height: a unitless multiplier, or a string in px or %."],
+  ["fill", '"#000"', "Text colour, any CSS colour string."],
+  ["style", '"normal"', '"normal" or "italic".'],
+  ["weight", "400", "A number or string, as in CSS."],
+  ["padding", "0", "Space around the text, in pixels. Effects draw into it."],
+  ["paddingTop / paddingRight / paddingBottom / paddingLeft", "0", "Per-side overrides."],
+];
+
+const changing = `text.value = "revision";          // rebuilds every Blotter drawing it
+text.properties = { size: 90 };   // merged over the defaults, then rebuilds
+
+await blotter.update();           // explicit rebuild, resolves when settled
+
+blotter.on("update", () => {
+  // fires after every rebuild; "ready" fires only for the first
+});`;
+
+const liquid = `import { Blotter, Text } from "blotter.ts";
+import { LiquidDistortMaterial } from "blotter.ts/materials";
+
+const text = new Text("observation", {
+  family: "'Gloock', serif",
+  size: 64,
+  fill: "#171717",
+  paddingLeft: 40,
+  paddingRight: 40,
+});
+
+const material = new LiquidDistortMaterial();
+
+// Uniforms are live: change these and the next frame picks them up.
+// 0 freezes the animation. Try 2.
+material.uniforms.uSpeed.value = 0.25;
+// How far the ripple pushes. Above 1 it gets wild.
+material.uniforms.uVolatility.value = 0.15;
+
+const blotter = new Blotter(material, { texts: text });
+blotter.forText(text)?.appendTo(output);`;
+
+const perText = `const blotter = new Blotter(material, { texts: [a, b] });
+await blotter.ready;
+
+// Only text "a" changes; "b" keeps the material's value.
+const scope = blotter.forText(a);
+if (scope) scope.material.uniforms.uOffset.value = 0.2;`;
+
+const flies = `import { Blotter, Text } from "blotter.ts";
+import { FliesMaterial } from "blotter.ts/materials";
+
+const props = {
+  family: "'Gloock', serif",
+  size: 64,
+  fill: "#171717",
+  paddingLeft: 40,
+  paddingRight: 40,
+  paddingTop: 24,
+  paddingBottom: 24,
+};
+const texts = [new Text("swarm", props), new Text("dodge", props)];
+
+const material = new FliesMaterial();
+material.uniforms.uSpeed.value = 2;
+
+const blotter = new Blotter(material, { texts });
+for (const text of texts) blotter.forText(text)?.appendTo(output);
+await blotter.ready;
+
+// Per-text uniforms live on the scope and exist after "ready".
+const scope = blotter.forText(texts[1]);
+scope.material.uniforms.uDodge.value = 1;
+scope.material.uniforms.uDodgeSpread.value = 0.25;
+
+// Move over the second word. Pointer y grows downwards,
+// shader UV grows upwards, so flip it.
+scope.on("mousemove", ({ x, y }) => {
+  scope.material.uniforms.uDodgePosition.value = [x, 1 - y];
+});`;
+
+const lifecycle = `blotter.stop();                 // pause the loop for this instance
+blotter.start();                // resume it
+
+blotter.forText(text)?.pause(); // pause one text, the others keep going
+blotter.forText(text)?.play();
+
+blotter.stop();                 // when you are done: stop, then
+blotter.teardown();             // release the render target and listeners`;
+
+const reduced = `if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const off = blotter.on("render", () => {
+    off();
+    blotter.stop(); // one frame drawn, then hold still
+  });
+}`;
+---
+
+<Docs
+  title="Texts and uniforms · blotter.ts"
+  description={page.description}
+  current="guide"
+  eyebrow="Guide"
+  heading={page.title}
+  lead={page.description}
+  groups={guideGroups()}
+  sections={page.sections}
+>
+  <h2 id="text-properties">Text properties</h2>
+  <p>
+    A <code>Text</code> takes a string and an optional styles object. The names are the CSS
+    ones you already know, and every one of them is optional.
+  </p>
+  <table>
+    <thead>
+      <tr><th scope="col">Property</th><th scope="col">Default</th><th scope="col">Notes</th></tr>
+    </thead>
+    <tbody>
+      {
+        properties.map(([name, def, note]) => (
+          <tr>
+            <td><code>{name}</code></td>
+            <td><code>{def}</code></td>
+            <td>{note}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+  <Callout title="Keep leading above 1" kind="warn">
+    <p>
+      Blotter positions texts inside the atlas by their computed height. A line height smaller
+      than the font size lets glyphs spill into a neighbouring text’s canvas.
+    </p>
+  </Callout>
+  <p>
+    Padding matters more than it does in CSS. Effects draw into it, so a channel split or a
+    swarm of flies that reaches past the glyphs needs room on the canvas to land on. When an
+    effect looks clipped, add padding.
+  </p>
+
+  <h2 id="changing-a-text">Changing a text</h2>
+  <p>
+    Texts are live objects. Assign a new <code>value</code> or a new set of
+    <code>properties</code> and every Blotter that draws the text rebuilds its atlas on the
+    next tick. Concurrent changes coalesce into one rebuild.
+  </p>
+  <CodeBlock code={changing} lang="ts" />
+  <p>
+    One subtlety: <code>properties</code> is replaced, not patched. The object you assign is
+    merged over the defaults, not over the previous values, so read
+    <code>text.properties</code> first if you want to keep what is there.
+  </p>
+
+  <h2 id="uniforms-are-live">Uniforms are live</h2>
+  <p>
+    A material describes <em>how</em> the text is drawn. Its uniforms are the dials. Each entry
+    in <code>material.uniforms</code> has a <code>value</code>, and writing to it reaches the
+    running shader on the next frame: no rebuild, no flicker. The bundled
+    <code>LiquidDistortMaterial</code> has three.
+  </p>
+  <Playground id="uniforms" code={liquid} />
+
+  <h2 id="per-text">Per-text overrides</h2>
+  <p>
+    Several texts can share one material and still look different. Each
+    <code>RenderScope</code> carries its own copy of the material’s uniforms, so a value set
+    through <code>scope.material.uniforms</code> applies to that text alone. They exist once
+    the first build is done, so read them after <code>await blotter.ready</code>.
+  </p>
+  <CodeBlock code={perText} lang="ts" />
+
+  <h2 id="pointer-events">Pointer events</h2>
+  <p>
+    A scope emits <code>mousedown</code>, <code>mouseup</code>, <code>mousemove</code>,
+    <code>mouseenter</code> and <code>mouseleave</code> once its canvas has been appended with
+    <code>appendTo</code>. The payload is the pointer position normalised to the canvas, from 0
+    to 1, with <code>y</code> growing downwards like the DOM. Shader UV space grows upwards, so
+    positions that feed a uniform get flipped on the way in.
+  </p>
+  <Playground id="pointer" code={flies} />
+
+  <h2 id="lifecycle">Lifecycle</h2>
+  <p>
+    Everything draws on <code>requestAnimationFrame</code>, which already pauses in background
+    tabs. For anything more deliberate you have a loop per Blotter and a switch per text.
+  </p>
+  <CodeBlock code={lifecycle} lang="ts" />
+  <p>
+    Two habits worth keeping. Respect <code>prefers-reduced-motion</code> by drawing one frame
+    and stopping, which leaves the effect visible but still. And pause instances that have
+    scrolled out of view, an <code>IntersectionObserver</code> calling <code>stop()</code> and
+    <code>start()</code> is enough.
+  </p>
+  <CodeBlock code={reduced} lang="ts" />
+</Docs>

@@ -1,0 +1,216 @@
+---
+import Callout from "@/components/Callout.astro";
+import CodeBlock from "@/components/CodeBlock.astro";
+import Playground from "@/components/Playground.astro";
+import { guideGroups, guidePage } from "@/data/guide";
+import Docs from "@/layouts/Docs.astro";
+
+const page = guidePage("/guide/custom-materials");
+
+const contract = `void mainImage( out vec4 mainImage, in vec2 fragCoord ) {
+  vec2 uv = fragCoord / uResolution;
+  mainImage = textTexture(uv);
+}`;
+
+const wobble = `import { Blotter, Material, Text, shaders } from "blotter.ts";
+
+const text = new Text("wobble", {
+  family: "'Gloock', serif",
+  size: 72,
+  fill: "#171717",
+  paddingLeft: 40,
+  paddingRight: 40,
+  paddingTop: 30,
+  paddingBottom: 30,
+});
+
+const material = new Material({
+  mainImage: \`
+    \${shaders.noise3d}
+
+    void mainImage( out vec4 mainImage, in vec2 fragCoord ) {
+      vec2 uv = fragCoord / uResolution;
+      uv.y += snoise(vec3(uv * 4.0, uGlobalTime)) * uAmount;
+      mainImage = textTexture(uv);
+    }
+  \`,
+  uniforms: {
+    uAmount: { type: "1f", value: 0.05 },
+  },
+});
+
+const blotter = new Blotter(material, { texts: text });
+blotter.forText(text)?.appendTo(output);`;
+
+const uniforms = `const material = new Material({
+  mainImage,
+  uniforms: {
+    uAmount: { type: "1f", value: 0.05 },        // float
+    uCenter: { type: "2f", value: [0.5, 0.5] },  // vec2
+    uTint:   { type: "3f", value: [1, 0.9, 0.8] }, // vec3
+    uEdge:   { type: "4f", value: [0, 0, 0, 1] }, // vec4
+  },
+});
+
+material.uniforms.uAmount.value = 0.1; // live, like any other uniform`;
+
+const shaderMaterial = `import { ShaderMaterial } from "blotter.ts";
+
+const material = new ShaderMaterial(mainImage, {
+  uniforms: { uAmount: { type: "1f", value: 0.05 } },
+});`;
+
+const subclass = `import { Material, shaders } from "blotter.ts";
+
+const mainImage = /* glsl */ \`
+  \${shaders.noise3d}
+
+  void mainImage( out vec4 mainImage, in vec2 fragCoord ) {
+    vec2 uv = fragCoord / uResolution;
+    uv.y += snoise(vec3(uv * 4.0, uGlobalTime)) * uAmount;
+    mainImage = textTexture(uv);
+  }
+\`;
+
+export class WobbleMaterial extends Material {
+  constructor() {
+    super({
+      mainImage,
+      uniforms: { uAmount: { type: "1f", value: 0.05 } },
+    });
+  }
+}`;
+
+const snippets: [string, string][] = [
+  ["noise, noise2d, noise3d, noise4d", "Simplex noise in one to four dimensions (snoise)."],
+  ["random", "A hash-based random for a vec2 seed."],
+  ["easing", "The Penner easing curves as GLSL functions."],
+  ["blending", "Photoshop-style blend modes: multiply, screen, overlay and friends."],
+  ["lineMath", "Distance and projection helpers for line segments."],
+  ["map", "Remap a value from one range to another."],
+  ["gamma", "sRGB to linear and back."],
+  ["blinnPhongSpecular", "A specular term for lighting tricks."],
+  ["pi, inf", "Constants."],
+];
+---
+
+<Docs
+  title="Custom materials · blotter.ts"
+  description={page.description}
+  current="guide"
+  eyebrow="Guide"
+  heading={page.title}
+  lead={page.description}
+  groups={guideGroups()}
+  sections={page.sections}
+>
+  <h2 id="why-write-a-shader">Why write a shader</h2>
+  <p>
+    The bundled materials cover a lot of ground, but the moment you want a specific look you
+    are one function away from having it. A material is a fragment shader in the Shadertoy
+    mould: a <code>mainImage</code> function that is called once per pixel and returns a
+    colour. Blotter supplies the text as a texture, the uniforms you declare, and a handful of
+    built-ins; you supply the pixels.
+  </p>
+  <p>
+    If shaders are new to you, spend ten minutes on <a href="https://shadertoy.com">Shadertoy</a>
+    first. Everything there transfers, with one substitution described below.
+  </p>
+
+  <h2 id="the-contract">The contract</h2>
+  <p>
+    Your <code>mainImage</code> receives the pixel’s coordinate and writes its colour. Sample the
+    text with <code>textTexture(uv)</code>, not <code>texture2D</code>: it maps the canvas UV into
+    the right region of the shared atlas, and returns transparent black for anything outside
+    this text’s bounds. This is the identity material, and the default when you construct a
+    <code>Material</code> without one.
+  </p>
+  <CodeBlock code={contract} lang="glsl" />
+  <p>Every material also receives these uniforms, kept up to date by the renderer:</p>
+  <ul>
+    <li><code>uResolution</code>, the canvas size in pixels, so <code>fragCoord / uResolution</code> is UV.</li>
+    <li><code>uGlobalTime</code>, seconds since the loop started, and <code>uTimeDelta</code>, seconds since the last frame.</li>
+    <li><code>uPixelRatio</code>, the device pixel ratio the atlas was drawn at.</li>
+    <li><code>uBlendColor</code>, a vec4 some materials composite against. It defaults to white.</li>
+  </ul>
+
+  <h2 id="first-material">A first material</h2>
+  <p>
+    Start from the identity material and bend the UV before sampling. Here a 3D simplex noise,
+    interpolated from the <code>shaders</code> namespace, pushes each row up and down over time.
+    The amount is a uniform so it can be tuned while it runs.
+  </p>
+  <Playground id="wobble" code={wobble} />
+
+  <h2 id="declaring-uniforms">Declaring uniforms</h2>
+  <p>
+    Uniforms are declared by name with a type and an initial value. Four types are supported,
+    matching the GLSL vector sizes, and the value shape follows the type. Blotter validates the
+    pair, declares the GLSL for you, and exposes each one as a live
+    <code>UniformInterface</code> on <code>material.uniforms</code>.
+  </p>
+  <CodeBlock code={uniforms} lang="ts" />
+
+  <h2 id="shader-material">ShaderMaterial</h2>
+  <p>
+    For a one-off effect there is a shorthand. <code>ShaderMaterial</code> takes the
+    <code>mainImage</code> string first and the rest of the options second, and is otherwise a
+    <code>Material</code>.
+  </p>
+  <CodeBlock code={shaderMaterial} lang="ts" />
+
+  <h2 id="subclassing">Subclassing</h2>
+  <p>
+    A material you will reuse deserves a name. Subclass <code>Material</code> and pass the shader
+    and uniforms up through <code>super</code>; this is exactly how the five bundled materials
+    are written, so <code>blotter.ts/materials</code> is a good place to read for patterns.
+  </p>
+  <CodeBlock code={subclass} lang="ts" />
+
+  <h2 id="snippets">Shader snippets</h2>
+  <p>
+    The <code>shaders</code> export is a namespace of GLSL strings, ready to interpolate at the
+    top of a <code>mainImage</code>. They are the helpers the bundled materials use.
+  </p>
+  <table>
+    <thead>
+      <tr><th scope="col">Snippet</th><th scope="col">Provides</th></tr>
+    </thead>
+    <tbody>
+      {
+        snippets.map(([name, what]) => (
+          <tr>
+            <td><code>{name}</code></td>
+            <td>{what}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+
+  <h2 id="gotchas">Gotchas</h2>
+  <ul>
+    <li>
+      <strong>Out of bounds is transparent.</strong> <code>textTexture</code> returns
+      <code>vec4(0.0)</code> outside the text’s own rectangle. Displace the UV too far and the
+      glyphs simply vanish; add padding to the <code>Text</code> to give an effect room.
+    </li>
+    <li>
+      <strong>Built-in names win.</strong> Declaring a uniform called <code>uResolution</code>
+      or <code>uGlobalTime</code> is allowed but pointless: the renderer overwrites those values
+      every frame.
+    </li>
+    <li>
+      <strong>Blending against the wrong colour.</strong> <code>uBlendColor</code> defaults to
+      white. A material that composites through it, such as <code>ChannelSplitMaterial</code>, will
+      show pale fringes on a dark page until you set it to your background colour.
+    </li>
+  </ul>
+  <Callout title="Debugging a shader">
+    <p>
+      A compile error surfaces as a rejected <code>blotter.ready</code> with the GLSL log in the
+      message. Start from the identity material, add one line at a time, and keep
+      <code>uAmount</code> small while you look.
+    </p>
+  </Callout>
+</Docs>
