@@ -6,6 +6,7 @@ import CodeBlock from "./CodeBlock.astro";
 import MaterialDemo from "./MaterialDemo.astro";
 import PageHeader from "./PageHeader.astro";
 import UniformDoc from "./UniformDoc.astro";
+import Heading from "@/components/docs/Heading.astro";
 
 interface Props {
   entry: MaterialEntry;
@@ -32,14 +33,14 @@ material.uniforms.${uniforms[0]?.name ?? "uSpeed"}.value = ${uniforms[0]?.defaul
       </aside>
       <div class="prose max-w-2xl lg:order-1">
         <slot name="intro" />
-        <h2 id="construction">Construction</h2>
+        <Heading id="construction">Construction</Heading>
         <p>
           <code>{entry.className}</code> extends <a href="/api/material"><code>Material</code></a>, so
           everything on a material, from <code>uniforms</code> to <code>update()</code>, works here
           too. Construct it with no arguments and set uniforms afterwards.
         </p>
         <CodeBlock code={construction} lang="ts" />
-        <h2 id="uniforms">Uniforms</h2>
+        <Heading id="uniforms">Uniforms</Heading>
         <p>
           Each entry in <code>material.uniforms</code> is a live
           <a href="/api/uniform-interface"><code>UniformInterface</code></a>: assign to its

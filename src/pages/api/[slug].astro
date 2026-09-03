@@ -6,6 +6,7 @@ import Sidebar from "@/components/docs/Sidebar.astro";
 import Base from "@/layouts/Base.astro";
 import { api, apiGroups } from "@/lib/api";
 import type { ApiSymbol } from "@/lib/api/model";
+import Heading from "@/components/docs/Heading.astro";
 
 export function getStaticPaths() {
   return api()
@@ -46,12 +47,12 @@ const inherited = symbol.members.filter((m) => m.inheritedFrom);
       <div class="prose max-w-2xl">
         {symbol.doc?.intro && <div set:html={symbol.doc.intro} />}
         {symbol.doc?.example && <CodeBlock code={symbol.doc.example} lang="ts" />}
-        <h2 id="members">Members</h2>
+        <Heading id="members">Members</Heading>
         {own.map((member) => <Member member={member} owner={symbol.name} />)}
         {
           inherited.length > 0 && (
             <Fragment>
-              <h2 id="inherited">Inherited</h2>
+              <Heading id="inherited">Inherited</Heading>
               <div data-pagefind-ignore>
                 {inherited.map((member) => <Member member={member} owner={symbol.name} />)}
               </div>

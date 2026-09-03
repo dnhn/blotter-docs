@@ -1,0 +1,23 @@
+---
+/**
+ * A prose heading with a permalink. The `#` appears on hover and on focus,
+ * and stays visible on coarse pointers, where there is no hover to reveal it.
+ * The heading keeps its `id`, which the sidebar anchors and the scrollspy use.
+ */
+interface Props {
+  id: string;
+  level?: 2 | 3;
+}
+
+const { id, level = 2 } = Astro.props;
+const Tag = `h${level}` as "h2" | "h3";
+---
+
+<Tag id={id} class="group">
+  <slot />
+  <a
+    href={`#${id}`}
+    class="not-prose ml-2 font-mono font-normal text-ink-3 no-underline opacity-0 transition-opacity group-hover:opacity-100 hover:text-accent focus-visible:opacity-100 pointer-coarse:opacity-100 motion-reduce:transition-none"
+    aria-label="Link to this section">#</a
+  >
+</Tag>

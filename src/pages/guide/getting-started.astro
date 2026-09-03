@@ -5,6 +5,7 @@ import Playground from "@/components/Playground.astro";
 import Sidenote from "@/components/Sidenote.astro";
 import { guideGroups, guidePage } from "@/data/guide";
 import Docs from "@/layouts/Docs.astro";
+import Heading from "@/components/docs/Heading.astro";
 
 const page = guidePage("/guide/getting-started");
 
@@ -51,7 +52,7 @@ const blotter = new Blotter(material, { texts: text });`;
   groups={guideGroups()}
   sections={page.sections}
 >
-  <h2 id="why-blotter">Why Blotter</h2>
+  <Heading id="why-blotter">Why Blotter</Heading>
   <p>
     CSS runs out of tricks for text quite quickly. You get shadows, gradients, a clip-path if
     you are feeling brave, and then you are exporting PNGs. Blotter takes a different route: it
@@ -66,7 +67,7 @@ const blotter = new Blotter(material, { texts: text });`;
     paragraph.
   </p>
 
-  <h2 id="install">Install</h2>
+  <Heading id="install">Install</Heading>
   <p>
     Blotter renders through <code>three</code> and leaves it to you to install, so the two go
     in together.
@@ -80,7 +81,7 @@ const blotter = new Blotter(material, { texts: text });`;
   </p>
   <CodeBlock code={imports} lang="ts" />
 
-  <h2 id="first-text">Your first text</h2>
+  <Heading id="first-text">Your first text</Heading>
   <p>
     A Blotter needs two things: at least one <code>Text</code>, and a <code>Material</code>
     that says how to draw it. The plain <code>Material</code> applies no effect at all, which
@@ -93,7 +94,7 @@ const blotter = new Blotter(material, { texts: text });`;
   </Sidenote>
   <Playground id="first-text" code={firstText} />
 
-  <h2 id="what-happened">What just happened</h2>
+  <Heading id="what-happened">What just happened</Heading>
   <p>
     Four objects took part, and you will meet them again on every page of this guide.
   </p>
@@ -124,7 +125,7 @@ const blotter = new Blotter(material, { texts: text });`;
     <code>imageData</code> should wait for it.
   </p>
 
-  <h2 id="fonts">Fonts come first</h2>
+  <Heading id="fonts">Fonts come first</Heading>
   <p>
     Because a text is rasterised the moment it is constructed, the font has to be there
     already. Build a Blotter while a web font is still downloading and you will get the
@@ -140,7 +141,7 @@ const blotter = new Blotter(material, { texts: text });`;
     </p>
   </Callout>
 
-  <h2 id="where-next">Where next</h2>
+  <Heading id="where-next">Where next</Heading>
   <p>
     <a href="/guide/texts-and-uniforms">Texts and uniforms</a> covers styling, changing a text
     after the fact, and turning the dials on a running effect. The

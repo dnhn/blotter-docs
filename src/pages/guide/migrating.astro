@@ -2,6 +2,7 @@
 import CodeBlock from "@/components/CodeBlock.astro";
 import { guideGroups, guidePage } from "@/data/guide";
 import Docs from "@/layouts/Docs.astro";
+import Heading from "@/components/docs/Heading.astro";
 
 const page = guidePage("/guide/migrating");
 
@@ -66,7 +67,7 @@ const rows: [string, string][] = [
   groups={guideGroups()}
   sections={page.sections}
 >
-  <h2 id="what-stayed">What stayed the same</h2>
+  <Heading id="what-stayed">What stayed the same</Heading>
   <p>
     Everything you liked about the rendering. Texts sharing a material are still bin-packed into
     one atlas and drawn in a single call; each text still gets its own canvas; the loop still
@@ -74,7 +75,7 @@ const rows: [string, string][] = [
     same uniforms. If a Blotter.js effect looked right, it looks the same here.
   </p>
 
-  <h2 id="what-changed">What changed</h2>
+  <Heading id="what-changed">What changed</Heading>
   <p>
     The API. Blotter.js was a script tag that put a namespace on <code>window</code>;
     <code>blotter.ts</code> is a typed ES module with two entry points and no globals.
@@ -97,13 +98,13 @@ const rows: [string, string][] = [
     </table>
   </div>
 
-  <h2 id="before-after">Before and after</h2>
+  <Heading id="before-after">Before and after</Heading>
   <p>The first example from the original documentation, as written for Blotter.js:</p>
   <CodeBlock code={before} lang="html" />
   <p>The same example against <code>blotter.ts</code>:</p>
   <CodeBlock code={after} lang="ts" />
 
-  <h2 id="behaviour-notes">Behaviour notes</h2>
+  <Heading id="behaviour-notes">Behaviour notes</Heading>
   <ul>
     <li>
       <code>forText</code> returns <code>undefined</code> for a text the instance does not know,
@@ -123,7 +124,7 @@ const rows: [string, string][] = [
     </li>
   </ul>
 
-  <h2 id="credits">Credits</h2>
+  <Heading id="credits">Credits</Heading>
   <p>
     Blotter was created by <a href="http://bradley.computer">Bradley Griffith</a>. Shader helpers
     are adapted from <a href="http://www.syedrezaali.com/">Reza Ali’s Fragment</a>, and atlas

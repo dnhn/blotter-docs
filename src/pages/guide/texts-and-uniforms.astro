@@ -4,6 +4,7 @@ import CodeBlock from "@/components/CodeBlock.astro";
 import Playground from "@/components/Playground.astro";
 import { guideGroups, guidePage } from "@/data/guide";
 import Docs from "@/layouts/Docs.astro";
+import Heading from "@/components/docs/Heading.astro";
 
 const page = guidePage("/guide/texts-and-uniforms");
 
@@ -115,7 +116,7 @@ const reduced = `if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
   groups={guideGroups()}
   sections={page.sections}
 >
-  <h2 id="text-properties">Text properties</h2>
+  <Heading id="text-properties">Text properties</Heading>
   <p>
     A <code>Text</code> takes a string and an optional styles object. The names are the CSS
     ones you already know, and every one of them is optional.
@@ -148,7 +149,7 @@ const reduced = `if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
     effect looks clipped, add padding.
   </p>
 
-  <h2 id="changing-a-text">Changing a text</h2>
+  <Heading id="changing-a-text">Changing a text</Heading>
   <p>
     Texts are live objects. Assign a new <code>value</code> or a new set of
     <code>properties</code> and every Blotter that draws the text rebuilds its atlas on the
@@ -161,7 +162,7 @@ const reduced = `if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
     <code>text.properties</code> first if you want to keep what is there.
   </p>
 
-  <h2 id="uniforms-are-live">Uniforms are live</h2>
+  <Heading id="uniforms-are-live">Uniforms are live</Heading>
   <p>
     A material describes <em>how</em> the text is drawn. Its uniforms are the dials. Each entry
     in <code>material.uniforms</code> has a <code>value</code>, and writing to it reaches the
@@ -170,7 +171,7 @@ const reduced = `if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
   </p>
   <Playground id="uniforms" code={liquid} />
 
-  <h2 id="per-text">Per-text overrides</h2>
+  <Heading id="per-text">Per-text overrides</Heading>
   <p>
     Several texts can share one material and still look different. Each
     <code>RenderScope</code> carries its own copy of the material’s uniforms, so a value set
@@ -179,7 +180,7 @@ const reduced = `if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
   </p>
   <CodeBlock code={perText} lang="ts" />
 
-  <h2 id="pointer-events">Pointer events</h2>
+  <Heading id="pointer-events">Pointer events</Heading>
   <p>
     A scope emits <code>mousedown</code>, <code>mouseup</code>, <code>mousemove</code>,
     <code>mouseenter</code> and <code>mouseleave</code> once its canvas has been appended with
@@ -189,7 +190,7 @@ const reduced = `if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
   </p>
   <Playground id="pointer" code={flies} />
 
-  <h2 id="lifecycle">Lifecycle</h2>
+  <Heading id="lifecycle">Lifecycle</Heading>
   <p>
     Everything draws on <code>requestAnimationFrame</code>, which already pauses in background
     tabs. For anything more deliberate you have a loop per Blotter and a switch per text.
