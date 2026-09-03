@@ -1,0 +1,48 @@
+---
+import { shaders } from "blotter.ts";
+import CodeBlock from "@/components/CodeBlock.astro";
+import { shadersNamespace } from "@/lib/api";
+import ApiPage from "@/layouts/ApiPage.astro";
+
+const ns = shadersNamespace();
+const members = ns?.members ?? [];
+const source = shaders as unknown as Record<string, string>;
+const usage = `import { Material, shaders } from "blotter.ts";
+
+const material = new Material({
+  mainImage: \`
+    \${shaders.noise2d}
+
+    void mainImage( out vec4 mainImage, in vec2 fragCoord ) {
+      vec2 uv = fragCoord / uResolution;
+      uv.x += snoise(uv * 3.0 + uGlobalTime) * 0.02;
+      mainImage = textTexture(uv);
+    }
+  \`,
+});`;
+---
+
+<ApiPage
+  title="Shaders · API · blotter.ts"
+  description="GLSL helper snippets exported from blotter.ts as strings."
+  heading="shaders"
+  lead={ns?.doc?.summary}
+  sections={members.map((m) => ({ id: m.name, title: m.name }))}
+>
+  {ns?.doc?.intro && <div class="[&>*+*]:mt-flow" set:html={ns.doc.intro} />}
+  <CodeBlock code={usage} lang="ts" />
+  {
+    members.map((m) => (
+      <section id={m.name} class="scroll-mt-24 border-t border-rule pt-6 [&>*+*]:mt-3">
+        <h3 class="mt-0! font-mono! text-[1.0625rem]! font-medium! not-italic!">
+          <a href={`#${m.name}`} class="text-ink! no-underline! hover:text-accent!">shaders.{m.name}</a>
+        </h3>
+        {m.doc?.description && <div class="text-small" set:html={m.doc.description} />}
+        <details class="text-small">
+          <summary class="cursor-pointer text-ink-2 hover:text-ink">GLSL source</summary>
+          <CodeBlock code={(source[m.name] ?? "").trim()} lang="glsl" class="mt-3" />
+        </details>
+      </section>
+    ))
+  }
+</ApiPage>

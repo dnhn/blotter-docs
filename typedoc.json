@@ -1,0 +1,23 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "node_modules/blotter.ts/dist/index.d.ts",
+    "node_modules/blotter.ts/dist/materials.d.ts"
+  ],
+  "json": "src/generated/api.json",
+  "pretty": false,
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeExternals": true,
+  "readme": "none",
+  "sort": ["source-order"],
+  "skipErrorChecking": true,
+  "validation": {
+    "notExported": false,
+    "invalidLink": false,
+    "notDocumented": false
+  },
+  "tsconfig": "typedoc.tsconfig.json",
+  "externalPattern": ["**/node_modules/three/**", "**/node_modules/@types/**"]
+}

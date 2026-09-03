@@ -1,0 +1,28 @@
+---
+import CodeBlock from "@/components/CodeBlock.astro";
+import type { ApiSymbol } from "@/lib/api/model";
+import TypeRef from "./TypeRef.astro";
+
+interface Props {
+  symbol: ApiSymbol;
+}
+
+const { symbol } = Astro.props;
+const importLine = `import { ${symbol.name} } from "${symbol.entry}";`;
+---
+
+<header class="mb-10 max-w-2xl">
+  <p class="eyebrow mb-4" data-pagefind-ignore>{symbol.kind} · {symbol.entry}</p>
+  <h1 class="font-display text-title text-ink" data-pagefind-meta="title">{symbol.name}</h1>
+  {symbol.doc?.summary && <p class="mt-5 text-xl/normal text-ink-2 text-pretty">{symbol.doc.summary}</p>}
+  {
+    symbol.extends && (
+      <p class="mt-4 font-mono text-code text-ink-2" data-pagefind-ignore>
+        extends <TypeRef tokens={symbol.extends} />
+      </p>
+    )
+  }
+  <div data-pagefind-ignore>
+    <CodeBlock code={importLine} lang="ts" class="mt-6" />
+  </div>
+</header>

@@ -1,0 +1,62 @@
+---
+import type { ApiMember, Signature } from "@/lib/api/model";
+import TypeRef from "./TypeRef.astro";
+
+/** One or more signature lines for a member, or a free function when `owner` is unset. */
+interface Props {
+  member: ApiMember;
+  owner?: string;
+  fn?: boolean;
+}
+
+const { member, owner, fn = false } = Astro.props;
+
+const prefix = fn ? "" : owner ? `${owner[0]?.toLowerCase() ?? ""}${owner.slice(1)}.` : "";
+const sigs: Signature[] = member.signatures.length ? member.signatures : [];
+---
+
+<div class="overflow-x-auto rounded-lg border border-rule bg-surface px-4 py-3 font-mono text-code leading-relaxed text-ink [&>*+*]:mt-1" data-pagefind-ignore>
+  {
+    member.kind === "constructor" && owner
+      ? sigs.map((sig) => (
+          <div>
+            new {owner}
+            {sig.typeParams.length ? `<${sig.typeParams.join(", ")}>` : ""}(
+            {sig.params.map((p, i) => (
+              <Fragment>
+                {i ? ", " : ""}
+                {p.rest ? "..." : ""}
+                {p.name}
+                {p.optional ? "?" : ""}: <TypeRef tokens={p.type} />
+              </Fragment>
+            ))}
+            )
+          </div>
+        ))
+      : member.kind === "method" || fn
+        ? sigs.map((sig) => (
+            <div>
+              {prefix}
+              {member.name}
+              {sig.typeParams.length ? `<${sig.typeParams.join(", ")}>` : ""}(
+              {sig.params.map((p, i) => (
+                <Fragment>
+                  {i ? ", " : ""}
+                  {p.rest ? "..." : ""}
+                  {p.name}
+                  {p.optional ? "?" : ""}: <TypeRef tokens={p.type} />
+                </Fragment>
+              ))}
+              ): <TypeRef tokens={sig.returns} />
+            </div>
+          ))
+        : (
+            <div>
+              {member.readonly ? <span class="text-ink-3">readonly </span> : null}
+              {prefix}
+              {member.name}
+              {member.optional ? "?" : ""}: <TypeRef tokens={member.type ?? [{ text: "unknown" }]} />
+            </div>
+          )
+  }
+</div>

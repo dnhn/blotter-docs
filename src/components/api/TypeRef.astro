@@ -1,0 +1,19 @@
+---
+import type { TypeToken } from "@/lib/api/model";
+
+interface Props {
+  tokens: readonly TypeToken[];
+}
+
+const { tokens } = Astro.props;
+---
+
+{
+  tokens.map((token) =>
+    token.href ? (
+      <a href={token.href} class="text-accent no-underline hover:underline">{token.text}</a>
+    ) : (
+      <Fragment>{token.text}</Fragment>
+    ),
+  )
+}

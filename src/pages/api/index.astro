@@ -1,0 +1,55 @@
+---
+import CodeBlock from "@/components/CodeBlock.astro";
+import { coreClasses, functions, materialClasses, plumbingClasses, shadersNamespace, types } from "@/lib/api";
+import ApiPage from "@/layouts/ApiPage.astro";
+
+const imports = `import { Blotter, Text, Material, ShaderMaterial, shaders } from "blotter.ts";
+import { ChannelSplitMaterial, FliesMaterial } from "blotter.ts/materials";`;
+
+const groups = [
+  { title: "Core", items: coreClasses() },
+  { title: "Plumbing", items: plumbingClasses() },
+  { title: "Functions", items: functions() },
+  { title: "Materials", items: materialClasses() },
+];
+const shaderNs = shadersNamespace();
+const typeList = types();
+---
+
+<ApiPage
+  title="API reference · blotter.ts"
+  description="Every export of blotter.ts and blotter.ts/materials: the classes, the utilities, the shader snippets and the types."
+  heading="API reference"
+  lead="Every export of blotter.ts and blotter.ts/materials: the classes you build with, the utilities around them, the GLSL snippets, and the types that tie them together."
+>
+  <p>Two entry points. The core classes, the <code>shaders</code> namespace and the utilities come from <code>blotter.ts</code>; the five bundled effects come from <code>blotter.ts/materials</code>. Both are ES modules with types, and both tree-shake.</p>
+  <CodeBlock code={imports} lang="ts" />
+  {
+    groups.map((group) => (
+      <Fragment>
+        <h2 id={group.title.toLowerCase()}>{group.title}</h2>
+        <dl class="grid gap-x-8 gap-y-4 sm:grid-cols-[max-content_minmax(0,1fr)]">
+          {group.items.map((s) => (
+            <Fragment>
+              <dt class="font-mono text-code">
+                <a href={s.href}>{s.name}</a>
+              </dt>
+              <dd class="text-small text-ink-2">{s.doc?.summary}</dd>
+            </Fragment>
+          ))}
+        </dl>
+      </Fragment>
+    ))
+  }
+  <h2 id="shaders">Shaders</h2>
+  <p>
+    <a href="/api/shaders"><code>shaders</code></a> is a namespace of GLSL snippets exported as strings:
+    {shaderNs?.members.map((m, i) => <Fragment>{i ? ", " : ""}<code>{m.name}</code></Fragment>)}.
+    {shaderNs?.doc?.summary}
+  </p>
+  <h2 id="types">Types</h2>
+  <p>
+    The <a href="/api/types">types page</a> lists every exported type and interface:
+    {typeList.map((t, i) => <Fragment>{i ? ", " : ""}<a href={t.href}><code>{t.name}</code></a></Fragment>)}.
+  </p>
+</ApiPage>

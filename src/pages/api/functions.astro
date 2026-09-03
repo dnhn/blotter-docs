@@ -1,0 +1,27 @@
+---
+import Member from "@/components/api/Member.astro";
+import { functions } from "@/lib/api";
+import type { ApiMember } from "@/lib/api/model";
+import ApiPage from "@/layouts/ApiPage.astro";
+
+const list = functions();
+const asMember = (s: (typeof list)[number]): ApiMember => ({
+  name: s.name,
+  kind: "method",
+  signatures: s.signatures,
+  readonly: false,
+  optional: false,
+  comment: s.comment,
+  doc: s.doc ? { description: s.doc.intro ?? s.doc.summary, example: s.doc.example } : undefined,
+});
+---
+
+<ApiPage
+  title="Functions · API · blotter.ts"
+  description="The standalone functions exported by blotter.ts."
+  heading="Functions"
+  lead="Three small utilities exported alongside the classes."
+  sections={list.map((f) => ({ id: f.name, title: f.name }))}
+>
+  {list.map((f) => <Member member={asMember(f)} fn />)}
+</ApiPage>

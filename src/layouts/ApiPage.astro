@@ -1,0 +1,29 @@
+---
+import { apiGroups } from "@/lib/api";
+import type { Section } from "@/data/nav";
+import Docs from "./Docs.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  eyebrow?: string;
+  heading: string;
+  lead?: string;
+  sections?: readonly Section[];
+}
+
+const { title, description, eyebrow = "API", heading, lead, sections } = Astro.props;
+---
+
+<Docs
+  title={title}
+  description={description}
+  current="api"
+  eyebrow={eyebrow}
+  heading={heading}
+  lead={lead}
+  groups={apiGroups()}
+  sections={sections}
+>
+  <slot />
+</Docs>

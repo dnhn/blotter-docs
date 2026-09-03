@@ -1,0 +1,85 @@
+---
+import TypeRef from "@/components/api/TypeRef.astro";
+import { types } from "@/lib/api";
+import ApiPage from "@/layouts/ApiPage.astro";
+
+const list = types();
+---
+
+<ApiPage
+  title="Types · API · blotter.ts"
+  description="Every type and interface exported by blotter.ts."
+  heading="Types"
+  lead="The option objects, event maps and uniform types the classes are built from. All are exported from blotter.ts for your own annotations."
+  sections={list.map((t) => ({ id: t.name, title: t.name }))}
+>
+  {
+    list.map((t) => (
+      <section id={t.name} class="scroll-mt-24 border-t border-rule pt-6 [&>*+*]:mt-3">
+        <h3 class="mt-0! flex flex-wrap items-baseline gap-x-3 font-mono! text-[1.0625rem]! font-medium! not-italic!">
+          <a href={`#${t.name}`} class="text-ink! no-underline! hover:text-accent!">{t.name}</a>
+          <span class="eyebrow">{t.kind}</span>
+        </h3>
+        {t.doc?.summary && <p class="text-small">{t.doc.summary}</p>}
+        <div class="overflow-x-auto rounded-lg border border-rule bg-surface px-4 py-3 font-mono text-code leading-relaxed text-ink" data-pagefind-ignore>
+          {t.doc?.signature ? (
+            <pre class="m-0 font-mono whitespace-pre-wrap">{t.doc.signature}</pre>
+          ) : t.members.length ? (
+            <div>
+              {t.kind === "interface" ? "interface " : "type "}
+              {t.name}
+              {t.typeParams.length ? `<${t.typeParams.join(", ")}>` : ""}
+              {t.kind === "interface" ? " {" : " = {"}
+              <div class="pl-4">
+                {t.members.map((m) => (
+                  <div>
+                    {m.readonly ? <span class="text-ink-3">readonly </span> : null}
+                    {m.name}
+                    {m.optional ? "?" : ""}:{" "}
+                    {m.signatures[0] ? (
+                      <Fragment>
+                        (
+                        {m.signatures[0].params.map((p, i) => (
+                          <Fragment>
+                            {i ? ", " : ""}
+                            {p.name}
+                            {p.optional ? "?" : ""}: <TypeRef tokens={p.type} />
+                          </Fragment>
+                        ))}
+                        ) =&gt; <TypeRef tokens={m.signatures[0].returns} />
+                      </Fragment>
+                    ) : (
+                      <TypeRef tokens={m.type ?? [{ text: "unknown" }]} />
+                    )}
+                    ;
+                  </div>
+                ))}
+              </div>
+              {"}"}
+            </div>
+          ) : (
+            <div>
+              type {t.name}
+              {t.typeParams.length ? `<${t.typeParams.join(", ")}>` : ""} = <TypeRef tokens={t.type ?? [{ text: "unknown" }]} />
+            </div>
+          )}
+        </div>
+        {t.doc?.intro && <div class="text-small [&>*+*]:mt-2" set:html={t.doc.intro} />}
+        {
+          t.members.some((m) => m.doc || m.comment) && (
+            <dl class="grid gap-x-6 gap-y-2 text-small sm:grid-cols-[max-content_minmax(0,1fr)]">
+              {t.members
+                .filter((m) => m.doc || m.comment)
+                .map((m) => (
+                  <Fragment>
+                    <dt class="font-mono text-code">{m.name}</dt>
+                    <dd class="text-ink-2" set:html={m.doc?.description ?? m.comment} />
+                  </Fragment>
+                ))}
+            </dl>
+          )
+        }
+      </section>
+    ))
+  }
+</ApiPage>

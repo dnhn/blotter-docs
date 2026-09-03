@@ -1,0 +1,76 @@
+---
+import CodeBlock from "@/components/CodeBlock.astro";
+import { materials } from "@/data/materials";
+import { materialClasses } from "@/lib/api";
+import { materialUniforms } from "@/lib/material-uniforms";
+import ApiPage from "@/layouts/ApiPage.astro";
+
+const classes = materialClasses();
+const entryFor = (name: string) => materials.find((m) => m.className === name);
+const imports = `import {
+  ChannelSplitMaterial,
+  FliesMaterial,
+  LiquidDistortMaterial,
+  RollingDistortMaterial,
+  SlidingDoorMaterial,
+} from "blotter.ts/materials";`;
+---
+
+<ApiPage
+  title="Materials · API · blotter.ts"
+  description="The five material classes exported from blotter.ts/materials, with their uniforms."
+  heading="blotter.ts/materials"
+  lead="Five subclasses of Material, each constructed with no arguments. Their uniforms are listed here from the running code; the materials pages explain what each one does."
+  sections={classes.map((c) => ({ id: c.name, title: c.name }))}
+>
+  <CodeBlock code={imports} lang="ts" />
+  {
+    classes.map((c) => {
+      const entry = entryFor(c.name);
+      const uniforms = entry ? materialUniforms(entry.className) : [];
+      return (
+        <section id={c.name} class="scroll-mt-24 border-t border-rule pt-6 [&>*+*]:mt-3">
+          <h3 class="mt-0! flex flex-wrap items-baseline gap-x-3 font-mono! text-[1.0625rem]! font-medium! not-italic!">
+            <a href={`#${c.name}`} class="text-ink! no-underline! hover:text-accent!">{c.name}</a>
+            <span class="eyebrow">class · extends Material</span>
+          </h3>
+          <p class="text-small">
+            {c.doc?.summary}{" "}
+            {entry && (
+              <a href={`/materials/${entry.slug}`}>Live demo and uniform notes.</a>
+            )}
+          </p>
+          <div class="overflow-x-auto rounded-lg border border-rule bg-surface px-4 py-3 font-mono text-code text-ink">
+            new {c.name}()
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Uniform</th>
+                <th scope="col">Type</th>
+                <th scope="col">Default</th>
+              </tr>
+            </thead>
+            <tbody>
+              {uniforms.map((u) => (
+                <tr>
+                  <td>
+                    <code>
+                      {entry ? <a href={`/materials/${entry.slug}#u-${u.name}`} class="no-underline">{u.name}</a> : u.name}
+                    </code>
+                  </td>
+                  <td>
+                    <code>"{u.type}"</code>
+                  </td>
+                  <td>
+                    <code>{u.defaultValue}</code>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      );
+    })
+  }
+</ApiPage>

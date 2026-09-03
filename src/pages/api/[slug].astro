@@ -1,0 +1,64 @@
+---
+import Member from "@/components/api/Member.astro";
+import SymbolHeader from "@/components/api/SymbolHeader.astro";
+import CodeBlock from "@/components/CodeBlock.astro";
+import Sidebar from "@/components/docs/Sidebar.astro";
+import Base from "@/layouts/Base.astro";
+import { api, apiGroups } from "@/lib/api";
+import type { ApiSymbol } from "@/lib/api/model";
+
+export function getStaticPaths() {
+  return api()
+    .symbols.filter((s) => s.kind === "class" && s.entry === "blotter.ts")
+    .map((s) => ({ params: { slug: s.slug }, props: { symbol: s } }));
+}
+
+interface Props {
+  symbol: ApiSymbol;
+}
+
+const { symbol } = Astro.props;
+const pathname = Astro.url.pathname.replace(/\/$/, "");
+// The overlay summary is written to follow the heading, so it never names the
+// symbol. Shared links and search results show it alone, hence the prefix.
+const description = symbol.doc?.summary
+  ? `${symbol.name} — ${symbol.doc.summary}`
+  : undefined;
+const own = symbol.members.filter((m) => !m.inheritedFrom);
+const inherited = symbol.members.filter((m) => m.inheritedFrom);
+---
+
+<Base
+  title={`${symbol.name} · API · blotter.ts`}
+  description={description}
+  current="api"
+>
+  <div class="lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-16">
+    <aside class="max-lg:hidden" data-pagefind-ignore>
+      <div
+        class="sticky top-[calc(4rem+var(--spacing-page-top))] -ml-2 max-h-[calc(100vh-4rem-var(--spacing-page-top)-2rem)] overflow-y-auto pr-4 pl-2"
+      >
+        <Sidebar groups={apiGroups()} pathname={pathname} />
+      </div>
+    </aside>
+    <div class="min-w-0">
+      <SymbolHeader symbol={symbol} />
+      <div class="prose">
+        {symbol.doc?.intro && <div class="[&>*+*]:mt-flow" set:html={symbol.doc.intro} />}
+        {symbol.doc?.example && <CodeBlock code={symbol.doc.example} lang="ts" />}
+        <h2 id="members">Members</h2>
+        {own.map((member) => <Member member={member} owner={symbol.name} />)}
+        {
+          inherited.length > 0 && (
+            <Fragment>
+              <h2 id="inherited">Inherited</h2>
+              <div data-pagefind-ignore>
+                {inherited.map((member) => <Member member={member} owner={symbol.name} />)}
+              </div>
+            </Fragment>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</Base>

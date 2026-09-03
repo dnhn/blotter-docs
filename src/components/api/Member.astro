@@ -1,0 +1,51 @@
+---
+import CodeBlock from "@/components/CodeBlock.astro";
+import { hrefForName } from "@/lib/api";
+import type { ApiMember } from "@/lib/api/model";
+import Signature from "./Signature.astro";
+
+interface Props {
+  member: ApiMember;
+  owner?: string;
+  fn?: boolean;
+}
+
+const { member, owner, fn = false } = Astro.props;
+const description = member.doc?.description ?? member.comment;
+const badge =
+  member.kind === "accessor"
+    ? member.settable
+      ? "get / set"
+      : "get"
+    : member.kind === "constructor"
+      ? "constructor"
+      : member.kind === "method" || fn
+        ? "method"
+        : "property";
+---
+
+<section id={member.name} class="scroll-mt-24 border-t border-rule pt-6 [&>*+*]:mt-3">
+  <h3 class="mt-0! flex flex-wrap items-baseline gap-x-3 font-mono! text-[1.0625rem]! font-medium! not-italic!">
+    <a href={`#${member.name}`} class="text-ink! no-underline! hover:text-accent!">{member.name}</a>
+    <span class="eyebrow">{badge}</span>
+    {member.inheritedFrom && <span class="text-caption font-sans font-normal text-ink-3">inherited from {member.inheritedFrom.split(".")[0]}</span>}
+  </h3>
+  <Signature member={member} owner={owner} fn={fn} />
+  {description && <div class="text-small [&>*+*]:mt-2" set:html={description} />}
+  {member.doc?.example && <CodeBlock code={member.doc.example} lang="ts" />}
+  {
+    member.doc?.see?.length ? (
+      <p class="text-caption text-ink-3">
+        See also{" "}
+        {member.doc.see.map((name, i) => (
+          <Fragment>
+            {i ? ", " : ""}
+            <a href={hrefForName(name) ?? "#"} class="text-accent">
+              <code class="text-[0.95em]">{name}</code>
+            </a>
+          </Fragment>
+        ))}
+      </p>
+    ) : null
+  }
+</section>
