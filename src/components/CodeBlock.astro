@@ -12,8 +12,8 @@ const { code, lang = "ts", class: className } = Astro.props;
 
 <div
   class:list={[
-    "code-block my-lh max-w-full",
-    "[&_.astro-code]:overflow-x-auto [&_.astro-code]:p-lh [&_.astro-code]:font-mono [&_.astro-code]:text-editor [&_.astro-code]:[text-shadow:0_0_3px_var(--color-editor-glow)]",
+    "code-block max-w-full",
+    "[&_.astro-code]:overflow-x-auto [&_.astro-code]:wrap-anywhere [&_.astro-code]:rounded-md [&_.astro-code]:border [&_.astro-code]:border-rule [&_.astro-code]:p-5 [&_.astro-code]:font-mono [&_.astro-code]:text-code",
     "[&_code]:rounded-none [&_code]:bg-transparent [&_code]:p-0 [&_code]:text-inherit [&_code]:text-[length:inherit] [&_code]:leading-[inherit]",
     className,
   ]}

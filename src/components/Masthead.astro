@@ -6,46 +6,64 @@ interface Props {
 }
 
 const { current } = Astro.props;
-const mobileClass = (mobile?: "hidden" | "show") =>
-  mobile === "hidden" ? "max-md:hidden" : mobile === "show" ? "md:hidden" : undefined;
 
-// Text padding only while the label is plain text; nav-blotter.ts flips
-// `data-state` to "canvas" once its Blotter canvas (own padding) is in.
+// The underline grows in from nothing and rests directly on the masthead's
+// bottom rule: 0.875rem is half the leftover height of the 2.25rem link
+// inside the 4rem bar.
 const link =
-  "inline-block border-none font-grotesk text-ui uppercase tracking-ui leading-[52px] " +
-  "data-[state=text]:px-half-lh aria-[current=page]:font-extrabold " +
-  "max-md:data-[state=text]:px-0 max-md:data-[state=text]:pl-pad-sm " +
-  "[&_.b-canvas]:inline-block [&_.b-canvas]:align-middle";
+  "relative inline-flex h-9 items-center px-2.5 text-small font-medium text-ink-2 transition-colors hover:text-ink max-sm:px-1.5 max-sm:text-caption " +
+  "aria-[current=page]:font-semibold aria-[current=page]:text-ink " +
+  "after:absolute after:inset-x-2.5 after:-bottom-3.5 after:h-[2px] after:origin-center after:scale-x-0 after:bg-accent after:transition-transform after:duration-150 after:content-[''] " +
+  "hover:after:scale-x-100 aria-[current=page]:after:scale-x-100 motion-reduce:after:transition-none " +
+  "max-sm:after:inset-x-1.5";
+
+const icon =
+  "inline-flex size-9 items-center justify-center rounded-sm text-ink-2 transition-colors hover:bg-surface hover:text-ink max-sm:size-8";
 ---
 
-<header
-  class="pointer-events-none fixed inset-x-0 top-0 z-100 mx-auto h-masthead min-w-layout max-w-[calc(100%-104px)] py-lh before:pointer-events-none before:fixed before:top-0 before:left-0 before:block before:h-masthead before:w-screen before:bg-linear-to-b before:from-paper before:to-paper/0 before:content-[''] max-md:min-w-0 max-md:max-w-none max-md:p-pad-sm"
->
-  <div class="relative flex items-center justify-between [&_a]:pointer-events-auto">
+<header class="sticky top-0 z-100 border-b border-rule bg-paper/85 backdrop-blur-md" data-pagefind-ignore>
+  <div class="mx-auto flex h-16 w-full max-w-336 items-center justify-between gap-2 px-gutter sm:gap-4">
     <a
       href="/"
-      class="flex h-13 items-center border-none font-display text-[32px] leading-none [&_.b-canvas]:-ml-[9px] [&_.b-canvas]:inline-block [&_.b-canvas]:h-[39px]! [&_.b-canvas]:w-auto! [&_.b-canvas]:align-top"
+      class="flex h-10 shrink-0 items-center font-display text-[1.75rem] leading-none text-ink max-sm:text-[1.5rem] [&_.b-canvas]:-ml-2.25 [&_.b-canvas]:inline-block [&_.b-canvas]:h-[39px]! [&_.b-canvas]:w-auto! [&_.b-canvas]:align-top max-sm:[&_.b-canvas]:-ml-1.75 max-sm:[&_.b-canvas]:h-8!"
       aria-label="Blotter, home"
     >
       <span data-logo-blotter>blotter</span>
     </a>
-    <nav aria-label="Primary">
-      <ul class="-mr-half-lh flex list-none p-0 max-md:mr-0">
+    <nav aria-label="Primary" class="flex min-w-0 items-center gap-0.5 sm:gap-3">
+      <ul class="flex list-none items-center gap-0.5 p-0 sm:gap-1">
         {
           NAV.map((item) => (
-            <li class:list={["ml-lh max-md:ml-0", mobileClass(item.mobile)]}>
-              <a
-                href={item.href}
-                class={link}
-                data-state="text"
-                aria-current={current === item.id ? "page" : undefined}
-              >
-                <span data-nav-blotter={item.label}>{item.label}</span>
+            <li>
+              <a href={item.href} class={link} aria-current={current === item.id ? "page" : undefined}>
+                {item.label}
               </a>
             </li>
           ))
         }
       </ul>
+      <div class="flex items-center gap-0.5 sm:border-l sm:border-rule sm:pl-3">
+        <button type="button" class={icon} data-search-open aria-label="Search" aria-keyshortcuts="Meta+K Control+K">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-3.5-3.5"></path>
+          </svg>
+        </button>
+        <button type="button" class={icon} data-theme-toggle aria-label="Switch to dark theme" aria-pressed="false">
+          <svg class="dark:hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4"></path>
+          </svg>
+          <svg class="not-dark:hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
+          </svg>
+        </button>
+        <a href="https://github.com/dnhn/blotter" class:list={[icon, "max-sm:hidden"]} aria-label="blotter.ts on GitHub">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2.17c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.13v3.16c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"></path>
+          </svg>
+        </a>
+      </div>
     </nav>
   </div>
 </header>

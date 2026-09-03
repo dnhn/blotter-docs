@@ -1,0 +1,18 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  /** Replaces the default bottom margin. */
+  class?: string;
+}
+
+const { eyebrow, title, lead, class: className = "mb-section" } = Astro.props;
+---
+
+<header class:list={["max-w-2xl", className]}>
+  {eyebrow && <p class="eyebrow mb-4" data-pagefind-ignore>{eyebrow}</p>}
+  <h1 class="font-display text-title text-ink text-balance" data-pagefind-meta="title">{title}</h1>
+  {lead && <p class="mt-5 text-xl/normal text-ink-2 text-pretty">{lead}</p>}
+  <slot />
+</header>

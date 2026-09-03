@@ -1,26 +1,30 @@
-export type NavId = 'overview' | 'basics' | 'materials' | 'documentation';
+export type NavId = 'guide' | 'materials' | 'api';
 
 export interface NavItem {
   id: NavId;
   label: string;
   href: string;
-  mobile?: 'hidden' | 'show';
 }
 
 export const NAV: readonly NavItem[] = [
-  { id: 'overview', label: 'OVERVIEW', href: '/overview', mobile: 'hidden' },
-  { id: 'basics', label: 'BASICS', href: '/basics' },
-  { id: 'materials', label: 'MATERIALS', href: '/materials' },
-  {
-    id: 'documentation',
-    label: 'DOCUMENTATION',
-    href: '/documentation',
-    mobile: 'hidden',
-  },
-  {
-    id: 'documentation',
-    label: 'DOCS',
-    href: '/documentation',
-    mobile: 'show',
-  },
+  { id: 'guide', label: 'Guide', href: '/guide/getting-started' },
+  { id: 'materials', label: 'Materials', href: '/materials' },
+  { id: 'api', label: 'API', href: '/api' },
 ];
+
+/** An in-page anchor listed under the current sidebar item. */
+export interface Section {
+  id: string;
+  title: string;
+}
+
+export interface SidebarItem {
+  href: string;
+  title: string;
+  sections?: readonly Section[];
+}
+
+export interface SidebarGroup {
+  label: string;
+  items: readonly SidebarItem[];
+}

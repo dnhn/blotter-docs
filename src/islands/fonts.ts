@@ -1,5 +1,20 @@
 import type { TextProperties } from 'blotter.ts';
 
+/** The three faces registered in astro.config.ts, by role. */
+export const FACE = {
+  display: '--font-face-display',
+  body: '--font-face-body',
+  mono: '--font-face-mono',
+} as const;
+
+/** Weights those faces are loaded at; Blotter must not ask for others. */
+export const WEIGHT = {
+  display: 400,
+  body: 400,
+  bodyMedium: 500,
+  bodySemibold: 600,
+} as const;
+
 /** Resolve a font-family list from a CSS custom property on `:root`. */
 export const cssFamily = (variable: string): string =>
   getComputedStyle(document.documentElement)
