@@ -7,16 +7,22 @@ import {
 } from 'blotter.ts';
 import { ChannelSplitMaterial } from 'blotter.ts/materials';
 import { heroLayouts } from '@/data/hero-layouts';
+import { retint } from './demo';
 import {
   cssFamily,
   debounce,
+  FACE,
   prefersReducedMotion,
+  WEIGHT,
   waitForFonts,
 } from './fonts';
+import { onThemeChange, readColor, toVec4 } from './theme';
 
-// No "Q": it does not sit well with this typeface (legacy note kept).
-const LETTERS = 'ABCDEFGHIJKLMNOPRSTUVWXYZ'.split('');
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+/** Thirteen sizes, smallest to largest; the layouts below expect this order. */
 const SIZES = [17, 17, 26, 26, 26, 26, 78, 78, 78, 104, 104, 156, 208];
+/** The layouts were drawn for a band this wide; sizes scale with it. */
+const DESIGN_WIDTH = 900;
 
 function shuffle<T>(input: readonly T[]): T[] {
   const out = [...input];
@@ -48,28 +54,37 @@ async function mountHero(el: HTMLElement): Promise<void> {
     return;
   }
 
-  const family = cssFamily('--font-figtree');
+  const family = cssFamily(FACE.body);
   const base: Partial<TextProperties> = {
     family,
-    weight: 800,
+    weight: WEIGHT.bodySemibold,
     leading: 1,
-    fill: '#202020',
+    fill: readColor('--ink'),
     paddingLeft: 60,
     paddingRight: 60,
     paddingTop: 50,
     paddingBottom: 50,
   };
 
+  const scale = Math.min(1.2, Math.max(0.55, el.clientWidth / DESIGN_WIDTH));
+  const sizes = SIZES.map((size) => Math.max(12, Math.round(size * scale)));
+
   await waitForFonts(
-    [...new Set(SIZES)].map((size) => `800 ${size}px ${family}`),
+    [...new Set(sizes)].map(
+      (size) => `${WEIGHT.bodySemibold} ${size}px ${family}`,
+    ),
     LETTERS.join(''),
   );
 
   const texts = shuffle(LETTERS)
-    .slice(0, SIZES.length)
-    .map((letter, i) => new Text(letter, { ...base, size: SIZES[i] }));
+    .slice(0, sizes.length)
+    .map((letter, i) => new Text(letter, { ...base, size: sizes[i] }));
 
-  const blotter = new Blotter(new ChannelSplitMaterial(), { texts });
+  const material = new ChannelSplitMaterial();
+  const blend = material.uniforms.uBlendColor;
+  if (blend) blend.value = toVec4(readColor('--paper'));
+  const blotter = new Blotter(material, { texts });
+  onThemeChange(() => retint(blotter, texts).catch(console.error));
   const scopes = texts
     .map((text) => blotter.forText(text))
     .filter((scope): scope is RenderScope => scope !== undefined);
@@ -107,6 +122,7 @@ async function mountHero(el: HTMLElement): Promise<void> {
   const aim = (px: number, py: number) => {
     for (const { scope, x, y } of centers) {
       const angle = (Math.atan2(py - y, px - x) * 180) / Math.PI + 180;
+      // Legacy formula: the split widens with distance, capped at 0.2.
       const blur = Math.min(0.2, Math.hypot(px - x, py - y));
       const uniforms = scope.material.uniforms;
       if (uniforms.uRotation) uniforms.uRotation.value = angle;
