@@ -15,7 +15,7 @@ const list = types();
 >
   {
     list.map((t) => (
-      <section id={t.name} class="scroll-mt-24 border-t border-rule pt-6 [&>*+*]:mt-3">
+      <section id={t.name} class="not-prose scroll-mt-24 border-t border-rule pt-6 [&>*+*]:mt-3">
         <h3 class="mt-0! flex flex-wrap items-baseline gap-x-3 font-mono! text-[1.0625rem]! font-medium! not-italic!">
           <a href={`#${t.name}`} class="text-ink! no-underline! hover:text-accent!">{t.name}</a>
           <span class="eyebrow">{t.kind}</span>

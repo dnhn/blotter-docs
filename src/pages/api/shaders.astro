@@ -29,11 +29,11 @@ const material = new Material({
   lead={ns?.doc?.summary}
   sections={members.map((m) => ({ id: m.name, title: m.name }))}
 >
-  {ns?.doc?.intro && <div class="[&>*+*]:mt-flow" set:html={ns.doc.intro} />}
+  {ns?.doc?.intro && <div set:html={ns.doc.intro} />}
   <CodeBlock code={usage} lang="ts" />
   {
     members.map((m) => (
-      <section id={m.name} class="scroll-mt-24 border-t border-rule pt-6 [&>*+*]:mt-3">
+      <section id={m.name} class="not-prose scroll-mt-24 border-t border-rule pt-6 [&>*+*]:mt-3">
         <h3 class="mt-0! font-mono! text-[1.0625rem]! font-medium! not-italic!">
           <a href={`#${m.name}`} class="text-ink! no-underline! hover:text-accent!">shaders.{m.name}</a>
         </h3>

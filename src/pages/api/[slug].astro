@@ -43,8 +43,8 @@ const inherited = symbol.members.filter((m) => m.inheritedFrom);
     </aside>
     <div class="min-w-0">
       <SymbolHeader symbol={symbol} />
-      <div class="prose">
-        {symbol.doc?.intro && <div class="[&>*+*]:mt-flow" set:html={symbol.doc.intro} />}
+      <div class="prose max-w-2xl">
+        {symbol.doc?.intro && <div set:html={symbol.doc.intro} />}
         {symbol.doc?.example && <CodeBlock code={symbol.doc.example} lang="ts" />}
         <h2 id="members">Members</h2>
         {own.map((member) => <Member member={member} owner={symbol.name} />)}

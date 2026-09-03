@@ -9,7 +9,7 @@ const { title, kind = "note" } = Astro.props;
 
 <aside
   class:list={[
-    "rounded-lg border-l-2 px-5 py-4 text-small",
+    "not-prose rounded-lg border-l-2 px-5 py-4 text-small",
     kind === "warn" ? "border-accent bg-accent-soft/60" : "border-ink-3 bg-surface",
   ]}
 >

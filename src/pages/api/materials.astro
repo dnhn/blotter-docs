@@ -29,7 +29,7 @@ const imports = `import {
       const entry = entryFor(c.name);
       const uniforms = entry ? materialUniforms(entry.className) : [];
       return (
-        <section id={c.name} class="scroll-mt-24 border-t border-rule pt-6 [&>*+*]:mt-3">
+        <section id={c.name} class="not-prose scroll-mt-24 border-t border-rule pt-6 [&>*+*]:mt-3">
           <h3 class="mt-0! flex flex-wrap items-baseline gap-x-3 font-mono! text-[1.0625rem]! font-medium! not-italic!">
             <a href={`#${c.name}`} class="text-ink! no-underline! hover:text-accent!">{c.name}</a>
             <span class="eyebrow">class · extends Material</span>
@@ -43,7 +43,7 @@ const imports = `import {
           <div class="overflow-x-auto rounded-lg border border-rule bg-surface px-4 py-3 font-mono text-code text-ink">
             new {c.name}()
           </div>
-          <table>
+          <table class="w-full border-collapse text-small [&_td]:border-b [&_td]:border-rule [&_td]:py-2 [&_td]:pr-3 [&_td]:align-top [&_th]:border-b [&_th]:border-ink [&_th]:py-2 [&_th]:pr-3 [&_th]:text-left [&_th]:font-semibold">
             <thead>
               <tr>
                 <th scope="col">Uniform</th>
