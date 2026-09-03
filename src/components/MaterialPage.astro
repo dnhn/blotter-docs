@@ -1,48 +1,62 @@
 ---
 import type { MaterialEntry } from "@/data/materials";
 import Base from "@/layouts/Base.astro";
-import ApiMember from "./ApiMember.astro";
+import { materialUniforms } from "@/lib/material-uniforms";
 import CodeBlock from "./CodeBlock.astro";
 import MaterialDemo from "./MaterialDemo.astro";
+import PageHeader from "./PageHeader.astro";
+import UniformDoc from "./UniformDoc.astro";
 
 interface Props {
   entry: MaterialEntry;
 }
 
 const { entry } = Astro.props;
+const uniforms = materialUniforms(entry.className);
 const construction = `import { ${entry.className} } from "blotter.ts/materials";
 
-const material = new ${entry.className}();`;
+const material = new ${entry.className}();
+material.uniforms.${uniforms[0]?.name ?? "uSpeed"}.value = ${uniforms[0]?.defaultValue ?? "1"};`;
 ---
 
-<Base title={`${entry.name} · blotter.ts`} description={entry.blurb} current="materials">
-  <div class="pt-content-top pb-masthead" data-material={entry.slug}>
+<Base title={`${entry.name} · blotter.ts`} description={entry.description} current="materials">
+  <div data-material={entry.slug}>
+    <PageHeader eyebrow="Material" title={entry.name} lead={entry.tagline} class="mb-8" />
     <MaterialDemo />
-    <div class="ml-auto w-full max-w-content max-md:max-w-full">
-      <div class="mb-gutter">
-        <h2>{entry.name}</h2>
+    <div class="mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-12">
+      <aside class="mb-10 lg:order-2 lg:mb-0" data-pagefind-ignore>
+        <div class="lg:sticky lg:top-[calc(4rem+var(--spacing-page-top))]">
+          <div class="tp-theme" data-controls></div>
+          <p class="mt-3 text-caption text-ink-3">Every control writes to a uniform; the banner picks it up on the next frame.</p>
+        </div>
+      </aside>
+      <div class="prose lg:order-1">
         <slot name="intro" />
+        <h2 id="construction">Construction</h2>
         <p>
-          <code>{entry.className}</code> extends <code>Material</code>, and therefore has the same
-          properties and functions as <a href="/documentation#material"><code>Material</code></a>.
+          <code>{entry.className}</code> extends <a href="/api/material"><code>Material</code></a>, so
+          everything on a material, from <code>uniforms</code> to <code>update()</code>, works here
+          too. Construct it with no arguments and set uniforms afterwards.
         </p>
+        <CodeBlock code={construction} lang="ts" />
+        <h2 id="uniforms">Uniforms</h2>
+        <p>
+          Each entry in <code>material.uniforms</code> is a live
+          <a href="/api/uniform-interface"><code>UniformInterface</code></a>: assign to its
+          <code>value</code> and the running effect changes. Set a value through a text’s render
+          scope to change that text alone.
+        </p>
+        {
+          uniforms.map((uniform) => (
+            <UniformDoc uniform={uniform}>
+              <slot name={uniform.name} />
+              <Fragment slot="value">
+                <slot name={`${uniform.name}-value`} />
+              </Fragment>
+            </UniformDoc>
+          ))
+        }
       </div>
-      <ul class="list-none p-0 [&>li]:mt-lh [&>li:first-child]:mt-0">
-        <ApiMember name="construction" id="construction">
-          <CodeBlock code={construction} lang="ts" />
-        </ApiMember>
-        <ApiMember name="uniforms" code="material.uniforms" id="uniforms">
-          <p class="description">
-            An object that holds the uniforms that describe how the material's effects should be
-            rendered. Each entry is a live <a href="/documentation#uniforms"><code>UniformInterface</code></a>:
-            assign to its <code>value</code> and the running effect updates. You should not replace
-            this property directly.
-          </p>
-          <ul class="ml-lh list-none p-0 text-[14px] leading-normal [&>li]:mt-lh">
-            <slot />
-          </ul>
-        </ApiMember>
-      </ul>
     </div>
   </div>
 </Base>

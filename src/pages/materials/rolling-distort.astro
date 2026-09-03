@@ -1,153 +1,72 @@
 ---
 import MaterialPage from "@/components/MaterialPage.astro";
-import UniformDoc from "@/components/UniformDoc.astro";
 import { materialBySlug } from "@/data/materials";
 
 const entry = materialBySlug("rolling-distort");
-if (!entry) throw new Error("Unknown material: rolling-distort");
+if (!entry) throw new Error("Unknown material");
 ---
 
 <MaterialPage entry={entry}>
   <p slot="intro">
-    Have you ever seen images of an old malfunctioning TV? One that was corrupted in a way that
-    caused the image to distort as if a wave was scrolling across it in an endless loop, shoving
-    the picture around as it moved? That's what our <code>RollingDistortMaterial</code>
-    effectively does to your text.
+    <code>RollingDistortMaterial</code> is the picture on a television that has given up. A wave
+    rolls across the text in an endless loop and shoves the image around as it passes, with a
+    layer of finer noise underneath. The uniforms describe the wave (how wide, how many cycles, how
+    tall), the noise (how busy, how tall), and the line they both travel along.
   </p>
 
-  <UniformDoc name="uSineDistortSpread" type="1f" default="0.05">
-    <p class="description">
-      Imagine a wave rolling across your text over time. The distance between the beginning and
-      end of this wave takes up some percent of the total amount of visible text as it moves. The
-      <code>uSineDistortSpread</code> uniform is used to describe this distance.
-    </p>
-    <p class="description" slot="value">
-      Any floating point value is acceptable, however you will likely want to keep this value
-      <code>0.5</code> and below. This value describes the distance (from <code>0.0</code> (0%) to
-      <code>1.0</code> (100%)) your wave spans on a line running away from the center point, as
-      described by the <code>uDistortPosition</code> uniform, along the axis perpendicular to the
-      one described by the <code>uRotation</code> uniform. Therefore setting this value to
-      anything above <code>0.5</code> will create distortions, as your wave will not have room to
-      complete itself before beginning anew.
-    </p>
-  </UniformDoc>
+  <Fragment slot="uSineDistortSpread">
+    <p>The width of the wave: how much of the text it covers from its leading edge to its trailing one.</p>
+  </Fragment>
+  <Fragment slot="uSineDistortSpread-value">
+    <p>A float from <code>0.0</code> to <code>1.0</code>, as a fraction of the distance from <code>uDistortPosition</code> along the axis perpendicular to <code>uRotation</code>. Above <code>0.5</code> the wave starts again before it has finished, which is its own kind of interesting.</p>
+  </Fragment>
 
-  <UniformDoc name="uSineDistortCycleCount" type="1f" default="2">
-    <p class="description">
-      A counterpart to the above <code>uSineDistortSpread</code>, this uniform describes the
-      number of wave cycles (crests and troughs) that should occur within the space defined by
-      <code>uSineDistortSpread</code>.
-    </p>
-    <p class="description" slot="value">
-      Any floating point value is acceptable. Setting this value to <code>1.0</code> would create
-      a single arching wave: just a crest with no trough. Setting this value to <code>2.0</code>
-      would create a full wave cycle: a crest and a trough. Play around, you'll get the idea.
-    </p>
-    <p class="description" slot="value">
-      Note that you don't have to use whole numbers here; using partial numbers (e.g.
-      <code>3.5</code>) creates interesting artifacts you might enjoy.
-    </p>
-  </UniformDoc>
+  <Fragment slot="uSineDistortCycleCount">
+    <p>How many crests and troughs fit inside the spread.</p>
+  </Fragment>
+  <Fragment slot="uSineDistortCycleCount-value">
+    <p>Any float. <code>1.0</code> is a single crest; <code>2.0</code> is a full cycle. Fractions such as <code>3.5</code> leave artefacts you may enjoy.</p>
+  </Fragment>
 
-  <UniformDoc name="uSineDistortAmplitude" type="1f" default="0.25">
-    <p class="description">
-      A counterpart to the above <code>uSineDistortCycleCount</code> and
-      <code>uSineDistortSpread</code>, this uniform describes the amplitude of the crests and
-      troughs determined by <code>uSineDistortCycleCount</code>.
-    </p>
-    <p class="description" slot="value">
-      Any floating point value is acceptable. When distortion on your text rotates, imagine a
-      virtual line running from the position described by the <code>uDistortPosition</code>
-      uniform and at the degrees described by the <code>uRotation</code> uniform. The wave
-      distortion amplitude described by the <code>uSineDistortAmplitude</code> uniform is relative
-      to this distance (from <code>0.0</code> (0%) to <code>1.0</code> (100%)).
-    </p>
-  </UniformDoc>
+  <Fragment slot="uSineDistortAmplitude">
+    <p>How tall the crests and troughs are.</p>
+  </Fragment>
+  <Fragment slot="uSineDistortAmplitude-value">
+    <p>Any float, as a fraction of the distance along the line running from <code>uDistortPosition</code> at the angle of <code>uRotation</code>.</p>
+  </Fragment>
 
-  <UniformDoc name="uNoiseDistortVolatility" type="1f" default="20">
-    <p class="description">
-      Apart from the main sine wave distortion, <code>RollingDistortMaterial</code> also provides
-      a way to define a more consistent and noisy distortion to your text. Because this distortion
-      lacks any specific position or spread, the <code>uNoiseDistortVolatility</code> uniform is
-      more concerned with an overall volatility your text will experience, or the rate at which
-      variation occurs along the distortion axis (see <code>uRotation</code>).
-    </p>
-    <p class="description" slot="value">
-      Any floating point value is acceptable. Higher values equate to a higher volatility. As
-      always, play with the values here until you find the effect you like.
-    </p>
-  </UniformDoc>
+  <Fragment slot="uNoiseDistortVolatility">
+    <p>Under the wave sits a constant, noisy distortion with no position or spread of its own. This is how quickly that noise varies along the distortion axis.</p>
+  </Fragment>
+  <Fragment slot="uNoiseDistortVolatility-value">
+    <p>Any float. Higher is busier.</p>
+  </Fragment>
 
-  <UniformDoc name="uNoiseDistortAmplitude" type="1f" default="0.01">
-    <p class="description">
-      The <code>uNoiseDistortAmplitude</code> uniform describes the amplitude of the crests and
-      troughs of the noise based distortion determined by <code>uNoiseDistortVolatility</code>.
-    </p>
-    <p class="description" slot="value">
-      Any floating point value is acceptable. When distortion on your text rotates, imagine a
-      virtual line running from the position described by the <code>uDistortPosition</code>
-      uniform and at the degrees described by the <code>uRotation</code> uniform. The noise
-      distortion amplitude described by the <code>uNoiseDistortAmplitude</code> uniform is
-      relative to this distance (from <code>0.0</code> (0%) to <code>1.0</code> (100%)).
-    </p>
-  </UniformDoc>
+  <Fragment slot="uNoiseDistortAmplitude">
+    <p>How far the noise pushes the pixels.</p>
+  </Fragment>
+  <Fragment slot="uNoiseDistortAmplitude-value">
+    <p>Any float, measured like <code>uSineDistortAmplitude</code>.</p>
+  </Fragment>
 
-  <UniformDoc name="uDistortPosition" type="2f" default="[0.5, 0.5]">
-    <p class="description">
-      When imagining a wave moving across your text, you likely imagine it moving along some axis.
-      For example, you may imagine the wave moving along a vertical line, from the top to the
-      bottom of your text. As the wave travelled along this line, its Y position would change. The
-      uniform <code>uDistortPosition</code> is used to describe the center position of your wave
-      and the noise distortion applied to your text.
-    </p>
-    <p class="description">
-      Note that when the distortion is animating, as described by the <code>uSpeed</code>
-      uniform, the animation occurs along a line running through the position described by the
-      <code>uDistortPosition</code> uniform, at an angle perpendicular to the angle described by
-      the <code>uRotation</code> uniform.
-    </p>
-    <p class="description" slot="value">
-      A pair of floating point values between <code>0.0</code> (0%) and <code>1.0</code> (100%),
-      relative to the width and height of your text respectively (including any padding and line
-      height).
-    </p>
-  </UniformDoc>
+  <Fragment slot="uDistortPosition">
+    <p>The centre of the wave and of the noise. Animation travels through this point along the axis perpendicular to <code>uRotation</code>.</p>
+  </Fragment>
+  <Fragment slot="uDistortPosition-value">
+    <p>A pair of floats from <code>0.0</code> to <code>1.0</code>, relative to the text’s width and height.</p>
+  </Fragment>
 
-  <UniformDoc name="uRotation" type="1f" default="170">
-    <p class="description">
-      The <code>uRotation</code> uniform describes the rotation, in degrees, of all distortion
-      applied to your text. For example, if you apply a wave distortion to your text the amplitude
-      of that wave, described by the <code>uSineDistortAmplitude</code> uniform, would rise and
-      fall along the angle at these degrees.
-    </p>
-    <p class="description">
-      Note that when the distortion is animating, as described by the <code>uSpeed</code>
-      uniform, the animation occurs along a line running through the position described by the
-      <code>uDistortPosition</code> uniform, at an angle perpendicular to the angle described by
-      the <code>uRotation</code> uniform.
-    </p>
-    <p class="description" slot="value">
-      A floating point value between <code>0.0</code> and <code>360.0</code>.
-    </p>
-  </UniformDoc>
+  <Fragment slot="uRotation">
+    <p>The angle, in degrees, along which all distortion is applied. The wave’s amplitude rises and falls along this angle; its travel is perpendicular to it.</p>
+  </Fragment>
+  <Fragment slot="uRotation-value">
+    <p>A float from <code>0.0</code> to <code>360.0</code>.</p>
+  </Fragment>
 
-  <UniformDoc name="uSpeed" type="1f" default="0.08">
-    <p class="description">
-      The <code>uSpeed</code> uniform describes the speed of the animation applied to the
-      distortion on your text.
-    </p>
-    <p class="description">
-      Note that when the distortion is animating, as described by the <code>uSpeed</code>
-      uniform, the animation occurs along a line running through the position described by the
-      <code>uDistortPosition</code> uniform, at an angle perpendicular to the angle described by
-      the <code>uRotation</code> uniform.
-    </p>
-    <p class="description" slot="value">
-      Any floating point value is acceptable, however you will likely want to keep this value
-      below <code>1.0</code>. This value acts as a multiplier against the default uniform passed to
-      all effects, <code>uGlobalTime</code>, which represents the time in seconds since the effect
-      started. Therefore, smaller values slow animation while higher values speed up animation.
-      Play around, you'll get the idea.
-    </p>
-  </UniformDoc>
+  <Fragment slot="uSpeed">
+    <p>How fast the wave travels.</p>
+  </Fragment>
+  <Fragment slot="uSpeed-value">
+    <p>Any float; the default is deliberately slow. It multiplies <code>uGlobalTime</code>, so <code>0.0</code> holds the wave still.</p>
+  </Fragment>
 </MaterialPage>

@@ -8,19 +8,22 @@ interface Props {
 const { entry } = Astro.props;
 ---
 
-<li class="relative h-masthead w-tile overflow-hidden border-2 border-ink bg-paper text-center">
-  <a href={`/materials/${entry.slug}`} class="group block h-full border-none" aria-label={entry.name}>
+<!-- The card clips its content, so the focus ring goes on the card rather than
+     the link inside it, where `overflow-hidden` would cut it away. -->
+<li
+  class="overflow-hidden rounded-lg border border-rule bg-surface transition-colors hover:border-ink-3 has-[a:focus-visible]:border-ink-3 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-accent"
+>
+  <a href={`/materials/${entry.slug}`} class="block focus-visible:outline-hidden">
     <div
-      class="flex h-full justify-center font-display data-fallback:items-center data-fallback:text-[68px] data-fallback:leading-none [&_.b-canvas]:mx-auto"
+      class="flex aspect-4/3 items-center justify-center overflow-hidden font-display data-fallback:text-[96px] data-fallback:leading-none [&_.b-canvas]:mx-auto [&_.b-canvas]:max-w-full"
       data-tile={entry.slug}
       aria-hidden="true"
+      data-pagefind-ignore
     >
     </div>
-    <div
-      class="absolute inset-0 bg-paper/90 p-half-lh text-left font-grotesk text-base leading-normal opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
-      aria-hidden="true"
-    >
-      <span>{entry.name}</span>
+    <div class="border-t border-rule bg-paper px-4 py-3">
+      <p class="text-small font-medium text-ink">{entry.name}</p>
+      <p class="mt-0.5 text-caption text-ink-2">{entry.tagline}</p>
     </div>
   </a>
 </li>

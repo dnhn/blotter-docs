@@ -1,74 +1,45 @@
 ---
 import MaterialPage from "@/components/MaterialPage.astro";
-import UniformDoc from "@/components/UniformDoc.astro";
 import { materialBySlug } from "@/data/materials";
 
 const entry = materialBySlug("channel-split");
-if (!entry) throw new Error("Unknown material: channel-split");
+if (!entry) throw new Error("Unknown material");
 ---
 
 <MaterialPage entry={entry}>
   <p slot="intro">
-    The <code>ChannelSplitMaterial</code> takes the Red, Green, and Blue values of the pixels that
-    construct your text, and splits them so that they spread in different directions away from
-    their original position. You've likely seen similar effects to this in the real world in
-    places such as old CRT monitors, damaged VHS tapes, or in the visible color distortion
-    fringing at the edges of a projector's light against a wall.
+    <code>ChannelSplitMaterial</code> takes the red, green and blue values of every pixel in your
+    text and lets them drift apart. You have seen the effect on an old CRT, on a worn VHS tape, and
+    in the coloured fringe where a projector’s light meets a wall. Green stays put; red and blue
+    slide away from it in opposite directions along an axis you choose.
   </p>
 
-  <UniformDoc name="uOffset" type="1f" default="0.05">
-    <p class="description">
-      The <code>uOffset</code> uniform is used to describe the distance apart that your RGB values
-      should spread. For this effect, the Green values stay in their original position, while the
-      Red and the Blue values spread in opposite directions away from one another along the axis
-      described by the <code>uRotation</code> uniform.
-    </p>
-    <p class="description" slot="value">
-      A floating point value between <code>0.0</code> (0%) and <code>1.0</code> (100%), relative
-      to the height of your text (including any padding and line height).
-    </p>
-    <p class="description" slot="value">
-      Note that for performance reasons regarding the blurring done with this effect, there is an
-      internal 200 pixel maximum that this value is clamped to. This means that if, for example,
-      the value for the <code>uOffset</code> uniform were to be <code>1.0</code> on a text with a
-      total height of 400 pixels, the effect will render as if the value were <code>0.5</code>.
-    </p>
-  </UniformDoc>
+  <Fragment slot="uOffset">
+    <p>How far the red and blue channels travel from the green one, along the axis set by <code>uRotation</code>.</p>
+  </Fragment>
+  <Fragment slot="uOffset-value">
+    <p>A float from <code>0.0</code> to <code>1.0</code>, as a fraction of the text’s total height, padding and line height included.</p>
+    <p>The blur behind this effect has an internal 200-pixel cap, so on a 400-pixel-tall text an offset of <code>1.0</code> renders as <code>0.5</code> would.</p>
+  </Fragment>
 
-  <UniformDoc name="uRotation" type="1f" default="45">
-    <p class="description">
-      The <code>uRotation</code> uniform describes the angle, in degrees, upon which channel
-      splitting should occur.
-    </p>
-    <p class="description" slot="value">
-      A floating point value between <code>0.0</code> and <code>360.0</code>.
-    </p>
-  </UniformDoc>
+  <Fragment slot="uRotation">
+    <p>The angle, in degrees, along which the channels split.</p>
+  </Fragment>
+  <Fragment slot="uRotation-value">
+    <p>A float from <code>0.0</code> to <code>360.0</code>.</p>
+  </Fragment>
 
-  <UniformDoc name="uApplyBlur" type="1f" default="1">
-    <p class="description">
-      The <code>uApplyBlur</code> uniform serves as a boolean (true/false) value, meant to tell the
-      effect whether or not to blur the splitting of RGB values along the axis determined by the
-      <code>uRotation</code> uniform. When true, a motion blur will be applied across the distance
-      described by the <code>uOffset</code> uniform, softening the separation of channels, and
-      creating a more ghostly effect.
-    </p>
-    <p class="description" slot="value">
-      A floating point value. Either <code>0.0</code> (false) or <code>1.0</code> (true).
-    </p>
-  </UniformDoc>
+  <Fragment slot="uApplyBlur">
+    <p>A switch. When on, a motion blur is drawn across the distance set by <code>uOffset</code>, so the channels smear into one another rather than sitting as three clean copies. Softer, ghostlier.</p>
+  </Fragment>
+  <Fragment slot="uApplyBlur-value">
+    <p>A float used as a boolean: <code>0.0</code> for off, <code>1.0</code> for on.</p>
+  </Fragment>
 
-  <UniformDoc name="uAnimateNoise" type="1f" default="1">
-    <p class="description">
-      When blurring is applied to your text, as determined by the <code>uApplyBlur</code> uniform,
-      <code>ChannelSplitMaterial</code> will apply a subtle amount of noise distortion to the
-      sampled RGB channels. This is both for performance and aesthetic reasons. The
-      <code>uAnimateNoise</code> uniform serves as a boolean (true/false) value, meant to tell the
-      effect whether or not to animate this noise. When true, the speckling of the noise will
-      animate to create a more static-like effect.
-    </p>
-    <p class="description" slot="value">
-      A floating point value. Either <code>0.0</code> (false) or <code>1.0</code> (true).
-    </p>
-  </UniformDoc>
+  <Fragment slot="uAnimateNoise">
+    <p>The blur samples the channels through a little noise, partly for speed and partly because it looks right. When this switch is on, that noise animates and the smear crackles like static.</p>
+  </Fragment>
+  <Fragment slot="uAnimateNoise-value">
+    <p>A float used as a boolean: <code>0.0</code> for off, <code>1.0</code> for on. Only matters while <code>uApplyBlur</code> is on.</p>
+  </Fragment>
 </MaterialPage>

@@ -1,100 +1,58 @@
 ---
 import MaterialPage from "@/components/MaterialPage.astro";
-import UniformDoc from "@/components/UniformDoc.astro";
 import { materialBySlug } from "@/data/materials";
 
 const entry = materialBySlug("flies");
-if (!entry) throw new Error("Unknown material: flies");
+if (!entry) throw new Error("Unknown material");
 ---
 
 <MaterialPage entry={entry}>
   <p slot="intro">
-    Veering in a tireless swarm, the <code>FliesMaterial</code> recreates your text as a cloud of
-    animated points.
+    <code>FliesMaterial</code> redraws your text as a swarm. Each point lives in its own small cell
+    on the text and wanders around it, tirelessly, occasionally trespassing on a neighbour. From a
+    distance the word holds together; up close it never sits still. Turn on dodging and the swarm
+    parts around a position you feed it, which is how the pointer example in the guide works.
   </p>
 
-  <UniformDoc name="uPointCellWidth" type="1f" default="0.04">
-    <p class="description">
-      Although regularly penetrating the space of others, each point rendered through the
-      <code>FliesMaterial</code> moves primarily within its own space on your text. Imagine a grid
-      of these spaces overlaid atop your text. The width and height of each unit within this grid
-      is equal to the value of the <code>uPointCellWidth</code> uniform.
-    </p>
-    <p class="description" slot="value">
-      A floating point value between <code>0.0</code> (0%) and <code>1.0</code> (100%), relative
-      to the height of your text (including any padding and line height). For example, if your
-      text has a total height of 100 pixels, and the value of the <code>uPointCellWidth</code>
-      uniform is <code>0.04</code>, each unit within the grid of used spaces described above will
-      have a width and a height of 4 pixels.
-    </p>
-  </UniformDoc>
+  <Fragment slot="uPointCellWidth">
+    <p>Imagine a grid laid over the text. Each point moves mostly within one cell of it, and this is the cell’s width and height.</p>
+  </Fragment>
+  <Fragment slot="uPointCellWidth-value">
+    <p>A float from <code>0.0</code> to <code>1.0</code>, as a fraction of the text’s total height. On a 100-pixel-tall text, <code>0.04</code> gives 4-pixel cells.</p>
+  </Fragment>
 
-  <UniformDoc name="uPointRadius" type="1f" default="0.75">
-    <p class="description">
-      The <code>uPointRadius</code> uniform describes the size of the points that together
-      constitute the <code>FliesMaterial</code> effect.
-    </p>
-    <p class="description" slot="value">
-      A floating point value between <code>0.0</code> (0%) and <code>1.0</code> (100%), relative
-      to half the value of the <code>uPointCellWidth</code> uniform. That is, given a value of
-      <code>1.0</code>, the <code>uPointRadius</code> uniform would describe a point with a total
-      circumference equal to the cell in which it exists as described by the
-      <code>uPointCellWidth</code> uniform.
-    </p>
-  </UniformDoc>
+  <Fragment slot="uPointRadius">
+    <p>The size of each point.</p>
+  </Fragment>
+  <Fragment slot="uPointRadius-value">
+    <p>A float from <code>0.0</code> to <code>1.0</code>, relative to half a cell. At <code>1.0</code> a point fills its cell edge to edge.</p>
+  </Fragment>
 
-  <UniformDoc name="uDodge" type="1f" default="0">
-    <p class="description">
-      There may be occasions in which you will want to diminish the presence of points created by
-      the <code>FliesMaterial</code> around a certain position within your text, such as to make
-      points dodge the cursor as a user swipes across your text on the page. The
-      <code>uDodge</code> uniform serves as a boolean (true/false) value, meant to tell the effect
-      whether or not to have its points dodge around the position described by the
-      <code>uDodgePosition</code> uniform, and at the distance described by the
-      <code>uDodgeSpread</code> uniform.
-    </p>
-    <p class="description" slot="value">
-      A floating point value. Either <code>0.0</code> (false) or <code>1.0</code> (true).
-    </p>
-  </UniformDoc>
+  <Fragment slot="uDodge">
+    <p>A switch. When on, points shrink away from <code>uDodgePosition</code> across the distance set by <code>uDodgeSpread</code>. The usual use is a pointer sweeping through the word.</p>
+  </Fragment>
+  <Fragment slot="uDodge-value">
+    <p>A float used as a boolean: <code>0.0</code> for off, <code>1.0</code> for on.</p>
+  </Fragment>
 
-  <UniformDoc name="uDodgePosition" type="2f" default="[0.5, 0.5]">
-    <p class="description">
-      The <code>uDodgePosition</code> uniform describes a position within your text away from
-      which the points of the <code>FliesMaterial</code> should dodge when the value of the
-      <code>uDodge</code> uniform is more than <code>0.0</code>.
-    </p>
-    <p class="description" slot="value">
-      A pair of floating point values between <code>0.0</code> (0%) and <code>1.0</code> (100%),
-      relative to the width and height of your text respectively (including any padding and line
-      height). The origin is the bottom-left corner of the text, as in WebGL.
-    </p>
-  </UniformDoc>
+  <Fragment slot="uDodgePosition">
+    <p>The position the swarm avoids while <code>uDodge</code> is on.</p>
+  </Fragment>
+  <Fragment slot="uDodgePosition-value">
+    <p>A pair of floats from <code>0.0</code> to <code>1.0</code>, relative to the text’s width and height. The origin is the bottom-left corner, as in WebGL, so a pointer position from the DOM needs its <code>y</code> flipped: <code>[x, 1 - y]</code>.</p>
+  </Fragment>
 
-  <UniformDoc name="uDodgeSpread" type="1f" default="0.25">
-    <p class="description">
-      When the value of the <code>uDodge</code> uniform is more than <code>0.0</code>, the points
-      of the <code>FliesMaterial</code> will increasingly diminish in size as they approach the
-      position described by the <code>uDodgePosition</code> uniform. The
-      <code>uDodgeSpread</code> uniform is used to describe the distance across which this
-      diminishing should occur.
-    </p>
-    <p class="description" slot="value">
-      A floating point value between <code>0.0</code> (0%) and <code>1.0</code> (100%), relative
-      to the height of your text (including any padding and line height).
-    </p>
-  </UniformDoc>
+  <Fragment slot="uDodgeSpread">
+    <p>How far from <code>uDodgePosition</code> the shrinking reaches.</p>
+  </Fragment>
+  <Fragment slot="uDodgeSpread-value">
+    <p>A float from <code>0.0</code> to <code>1.0</code>, as a fraction of the text’s total height.</p>
+  </Fragment>
 
-  <UniformDoc name="uSpeed" type="1f" default="1">
-    <p class="description">
-      The <code>uSpeed</code> uniform describes the speed of the animation of the points of the
-      <code>FliesMaterial</code>.
-    </p>
-    <p class="description" slot="value">
-      Any floating point value is acceptable. This value acts as a multiplier against the default
-      uniform passed to all effects, <code>uGlobalTime</code>, which represents the time in
-      seconds since the effect started. Therefore, smaller values slow animation while higher
-      values speed up animation. Play around, you'll get the idea.
-    </p>
-  </UniformDoc>
+  <Fragment slot="uSpeed">
+    <p>How fast the points move.</p>
+  </Fragment>
+  <Fragment slot="uSpeed-value">
+    <p>Any float. It multiplies <code>uGlobalTime</code>, the seconds since the effect started, so <code>0.0</code> freezes the swarm and <code>2.0</code> doubles its pace.</p>
+  </Fragment>
 </MaterialPage>

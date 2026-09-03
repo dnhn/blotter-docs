@@ -1,29 +1,26 @@
 ---
 import MaterialTile from "@/components/MaterialTile.astro";
+import PageHeader from "@/components/PageHeader.astro";
 import { materials } from "@/data/materials";
 import Base from "@/layouts/Base.astro";
 ---
 
-<Base title="Materials · blotter.ts" current="materials">
-  <div class="pt-content-top pb-masthead">
-    <div class="ml-auto w-full max-w-content max-md:max-w-full">
-      <div class="mb-gutter">
-        <h2 id="materials">Materials</h2>
-        <p>
-          Blotter Materials describe how your texts will be rendered and provide the interface
-          through which you can introduce variety in the characteristics of any effect.
-        </p>
-        <p>
-          Listed below are Blotter's current set of ready-to-use materials, all exported from
-          <code>blotter.ts/materials</code>. For information on creating custom materials for
-          private use, or for contributing new materials to
-          <a href="https://github.com/dnhn/blotter">Blotter</a> to be listed here, see the
-          <a href="/documentation#custom-materials">documentation</a>.
-        </p>
-      </div>
-    </div>
-    <ul class="grid list-none grid-cols-[repeat(auto-fill,208px)] gap-lh p-0">
-      {materials.map((entry) => <MaterialTile entry={entry} />)}
-    </ul>
-  </div>
+<Base
+  title="Materials · blotter.ts"
+  description="The five effects bundled with blotter.ts, each with live controls."
+  current="materials"
+>
+  <PageHeader
+    eyebrow="Materials"
+    title="Five effects, ready to drop in."
+    lead="A material describes how a text is drawn: a fragment shader with named uniforms you can change while it runs. These five ship in blotter.ts/materials."
+    class="mb-12"
+  />
+  <ul class="grid list-none grid-cols-1 gap-5 p-0 sm:grid-cols-2 lg:grid-cols-3">
+    {materials.map((entry) => <MaterialTile entry={entry} />)}
+  </ul>
+  <p class="mt-12 max-w-2xl text-base text-ink-2">
+    None of them quite right? <a href="/guide/custom-materials" class="text-accent underline">Write your own</a>:
+    a material is one GLSL function, and the bundled ones are written the same way you would.
+  </p>
 </Base>

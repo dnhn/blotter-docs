@@ -14,7 +14,7 @@ export type Control =
       min: number;
       max: number;
       step?: number;
-      /** Value applied before the first render (legacy `setImmediate`). */
+      /** Value applied before the first render. */
       initial?: number;
     }
   | { kind: 'bool'; uniform: string }
@@ -31,41 +31,42 @@ export interface MaterialEntry {
   slug: string;
   name: string;
   className: MaterialClassName;
-  blurb: string;
+  /** A few words under the name in the gallery. */
+  tagline: string;
+  /** One sentence; the page's meta description. */
+  description: string;
   controls: Control[];
   tileText?: Partial<TextProperties>;
   demoText?: Partial<TextProperties>;
 }
 
-/** "B" in the materials grid tiles. `family` is resolved at runtime. */
+/** "B" in the materials grid tiles. `family` and `fill` are resolved at runtime. */
 export const TILE_TEXT: Partial<TextProperties> = {
-  size: 68,
-  leading: '68px',
-  paddingTop: 26,
-  paddingRight: 40,
-  paddingBottom: 6,
-  paddingLeft: 40,
-  fill: '#202020',
+  size: 96,
+  leading: '96px',
+  paddingTop: 40,
+  paddingRight: 56,
+  paddingBottom: 24,
+  paddingLeft: 56,
 };
 
-/** Cropped "B" at the top of each material page. */
+/** The word in the banner of each material page; `size` follows the container. */
 export const DEMO_TEXT: Partial<TextProperties> = {
-  size: 187,
-  leading: '187px',
-  paddingTop: 126,
-  paddingRight: 140,
-  paddingBottom: 126,
-  paddingLeft: 140,
-  fill: '#202020',
+  leading: 1.2,
+  paddingTop: 40,
+  paddingRight: 72,
+  paddingBottom: 40,
+  paddingLeft: 72,
 };
 
 export const materials: MaterialEntry[] = [
   {
     slug: 'channel-split',
+    tagline: 'RGB channels drift apart',
     name: 'ChannelSplitMaterial',
     className: 'ChannelSplitMaterial',
-    blurb:
-      'Splits the red, green and blue channels of your text so they spread away from their original position, like a damaged VHS tape or the fringing of a projector.',
+    description:
+      'Splits the red, green and blue channels of your text and lets them drift apart along an angle you choose, with an optional motion blur.',
     controls: [
       { kind: 'float', uniform: 'uOffset', min: 0, max: 1, initial: 0.0175 },
       { kind: 'float', uniform: 'uRotation', min: 0, max: 360 },
@@ -75,10 +76,11 @@ export const materials: MaterialEntry[] = [
   },
   {
     slug: 'flies',
+    tagline: 'Text as a restless swarm',
     name: 'FliesMaterial',
     className: 'FliesMaterial',
-    blurb:
-      'Veering in a tireless swarm, the FliesMaterial recreates your text as a cloud of animated points.',
+    description:
+      'Redraws your text as a swarm of points that wander their own cells and part around a position you feed them.',
     controls: [
       {
         kind: 'float',
@@ -102,10 +104,11 @@ export const materials: MaterialEntry[] = [
   },
   {
     slug: 'liquid-distort',
+    tagline: 'A pool-bottom ripple',
     name: 'LiquidDistortMaterial',
     className: 'LiquidDistortMaterial',
-    blurb:
-      'Like watching the tiles on the bottom of a swimming pool, the LiquidDistortMaterial washes over your text to apply a liquid-like distortion.',
+    description:
+      'Bends your text through a slow field of noise, like tiles seen through moving water.',
     controls: [
       { kind: 'float', uniform: 'uSpeed', min: 0, max: 5 },
       { kind: 'float', uniform: 'uVolatility', min: 0, max: 1 },
@@ -114,10 +117,11 @@ export const materials: MaterialEntry[] = [
   },
   {
     slug: 'rolling-distort',
+    tagline: 'A wave rolls through',
     name: 'RollingDistortMaterial',
     className: 'RollingDistortMaterial',
-    blurb:
-      'A wave scrolls across your text in an endless loop, shoving the picture around as it moves, like the image on an old malfunctioning TV.',
+    description:
+      'Rolls a wave across your text with finer noise underneath, like the picture on a failing television.',
     controls: [
       {
         kind: 'float',
@@ -143,10 +147,11 @@ export const materials: MaterialEntry[] = [
   },
   {
     slug: 'sliding-door',
+    tagline: 'Panes that slide and split',
     name: 'SlidingDoorMaterial',
     className: 'SlidingDoorMaterial',
-    blurb:
-      'Multiplies your text into a series of segmented panes that slide in stunted progression, splitting and reorganising your text again and again.',
+    description:
+      'Cuts your text into panes that slide out of their frames and back, one after another, without end.',
     controls: [
       {
         kind: 'float',

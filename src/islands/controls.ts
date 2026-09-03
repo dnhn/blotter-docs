@@ -1,8 +1,9 @@
-import type { Material, Vec2 } from 'blotter.ts';
+import type { Blotter, Material, Vec2 } from 'blotter.ts';
 import { Pane } from 'tweakpane';
 import type { Control } from '@/data/materials';
+import { renderOnce } from './demo';
 
-/** Apply legacy `setImmediate` values so the first frame already uses them. */
+/** Apply each control's starting value so the first frame already uses it. */
 export function applyInitialValues(
   material: Material,
   controls: Control[],
@@ -16,6 +17,7 @@ export function applyInitialValues(
 
 export function bindControls(
   container: HTMLElement,
+  blotter: Blotter,
   material: Material,
   controls: Control[],
 ): Pane {
@@ -36,6 +38,7 @@ export function bindControls(
         })
         .on('change', (ev) => {
           uniform.value = ev.value;
+          renderOnce(blotter);
         });
     } else if (control.kind === 'bool') {
       const state = { value: (uniform.value as number) > 0 };
@@ -43,6 +46,7 @@ export function bindControls(
         .addBinding(state, 'value', { label: control.uniform })
         .on('change', (ev) => {
           uniform.value = ev.value ? 1 : 0;
+          renderOnce(blotter);
         });
     } else {
       const [x, y] = uniform.value as Vec2;
@@ -61,6 +65,7 @@ export function bindControls(
         })
         .on('change', (ev) => {
           uniform.value = [ev.value.x, ev.value.y];
+          renderOnce(blotter);
         });
     }
   }
