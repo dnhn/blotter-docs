@@ -1,9 +1,12 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/*  Theme switch. `data-theme` is set by the inline script in Head.astro only
-    when the visitor has chosen; otherwise the OS preference applies. Every
-    colour token below is a `light-dark()` pair resolved by `color-scheme`. */
+/*  Theme switch. `data-theme` is present only when the visitor has chosen
+    (set before paint by the inline script in Head.astro, and on toggle by
+    islands/theme.ts); otherwise the OS preference applies through the media
+    query and keeps tracking it live. Every colour token below is a
+    `light-dark()` pair resolved by `color-scheme`. The `dark` variant mirrors
+    the same two conditions so `dark:` utilities and the tokens always agree. */
 :root {
   @apply scheme-light;
 }
@@ -18,7 +21,19 @@
   @apply scheme-dark;
 }
 
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(
+        :root:not([data-theme="light"]),
+        :root:not([data-theme="light"]) *
+      ) {
+      @slot;
+    }
+  }
+}
 
 /*  Semantic palette: neutral grays, one restrained slate accent. Every text
     colour clears WCAG AAA (7:1) on paper, surface and code-bg in both themes;

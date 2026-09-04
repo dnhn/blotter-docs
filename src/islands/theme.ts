@@ -20,8 +20,7 @@ export function currentTheme(): Theme {
   return attr === 'dark' || attr === 'light' ? attr : systemTheme();
 }
 
-function apply(theme: Theme): void {
-  document.documentElement.dataset.theme = theme;
+function announce(theme: Theme): void {
   document.dispatchEvent(new CustomEvent('themechange', { detail: theme }));
 }
 
@@ -32,14 +31,18 @@ export function setTheme(theme: Theme): void {
   } catch {
     // Storage may be unavailable; the attribute still applies for this page.
   }
-  apply(theme);
+  document.documentElement.dataset.theme = theme;
+  announce(theme);
 }
 
 /** Runs `cb` after every theme change, including OS changes when nothing is stored. */
 export function onThemeChange(cb: (theme: Theme) => void): () => void {
   const onEvent = () => cb(currentTheme());
+  // With no stored choice the attribute stays off and CSS already follows the
+  // OS; the islands only need telling. Pinning the attribute here would freeze
+  // a value the browser may still correct.
   const onMedia = () => {
-    if (!storedTheme()) apply(systemTheme());
+    if (!storedTheme()) announce(systemTheme());
   };
   document.addEventListener('themechange', onEvent);
   media.addEventListener('change', onMedia);
