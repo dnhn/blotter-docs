@@ -17,7 +17,7 @@ import { ChannelSplitMaterial } from "blotter.ts/materials";`;
 const firstText = `import { Blotter, Material, Text } from "blotter.ts";
 
 const text = new Text("observation", {
-  family: "'Gloock', serif",
+  family: "'Castoro', serif",
   size: 64,
   fill: "#171717",
   paddingLeft: 20,
@@ -31,12 +31,12 @@ blotter.forText(text)?.appendTo(output);
 await blotter.ready;`;
 
 const fonts = `const text = new Text("observation", {
-  family: "'Gloock', serif",
+  family: "'Castoro', serif",
   size: 64,
 });
 
 // Load the exact face, weight and size Blotter is about to draw with.
-await document.fonts.load('400 64px "Gloock"', text.value);
+await document.fonts.load('400 64px "Castoro"', text.value);
 await document.fonts.ready;
 
 const blotter = new Blotter(material, { texts: text });`;

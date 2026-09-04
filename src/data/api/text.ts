@@ -9,7 +9,7 @@ export default {
   example: `import { Text } from "blotter.ts";
 
 const text = new Text("observation", {
-  family: "'Gloock', serif",
+  family: "'Castoro', serif",
   size: 64,
   fill: "#1c1917",
   paddingLeft: 20,

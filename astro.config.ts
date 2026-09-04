@@ -20,10 +20,10 @@ export default defineConfig({
   fonts: [
     {
       provider: fontProviders.google(),
-      name: 'Gloock',
+      name: 'Castoro',
       cssVariable: '--font-face-display',
       weights: [400],
-      styles: ['normal'],
+      styles: ['normal', 'italic'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'serif'],
     },
